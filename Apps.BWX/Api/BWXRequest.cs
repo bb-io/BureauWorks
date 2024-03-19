@@ -9,7 +9,7 @@ public class BWXRequest : RestRequest
     public BWXRequest(string endpoint, Method method, IEnumerable<AuthenticationCredentialsProvider> creds) : base(
         endpoint, method)
     {
-        var token = creds.First(x => x.KeyName == "accessToken").Value;
+        var token = creds.First(x => x.KeyName == "accessKey").Value;
         var secret = creds.First(x => x.KeyName == "secret").Value;
         this.AddHeader("X-AUTH-TOKEN", GetXAuthToken(token, secret));
     }

@@ -20,7 +20,7 @@ public class ProjectActions : BWXInvocable
     }
 
     [Action("Search projects", Description = "Search projects")]
-    public async Task<List<ProjectDto>> SearchProjects([ActionParameter] GetProjectRequest input)
+    public async Task<List<ProjectDto>> SearchProjects()
     {
         var request = new BWXRequest($"/api/v3/project", Method.Get, Creds);
         return await Client.Paginate<ProjectDto>(request);
