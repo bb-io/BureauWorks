@@ -32,4 +32,12 @@ public class ProjectActions : BWXInvocable
         var request = new BWXRequest($"/api/v3/project/{input.ProjectId}", Method.Get, Creds);
         return Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
+
+    [Action("Create project", Description = "Create project")]
+    public Task<ProjectDto> CreateProject([ActionParameter] CreateProjectRequest input)
+    {
+        var inferSettingParameter = input.InferDefaultSettings.HasValue ? $"?inferDefaultSettings={input.InferDefaultSettings.Value}" : "";
+        var request = new BWXRequest($"/api/v3/project{inferSettingParameter}", Method.Get, Creds);
+        return Client.ExecuteWithErrorHandling<ProjectDto>(request);
+    }
 }
