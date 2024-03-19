@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <Product>BWX</Product>
+	  <Version>1.0.0</Version>
+	  <Description>Bureau Works is cutting edge translation software that helps its users translate at greater speeds and with an increased sense of authorship.</Description>
+	  <AssemblyName>Apps.BWX</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.5.0" />
+    <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.0.2-alpha1" />
+    <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.25" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataSourceHandlers\EnumDataHandlers\" />
+  </ItemGroup>
+</Project>
