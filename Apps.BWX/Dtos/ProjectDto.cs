@@ -38,7 +38,7 @@ namespace Apps.BWX.Dtos
     public class Client
     {
         public string Uuid { get; set; }
-        public Organization Organization { get; set; }
+        public OrganizationDto Organization { get; set; }
         public string Name { get; set; }
         public string SourceLanguage { get; set; }
         public List<string> TargetLanguages { get; set; }
@@ -82,13 +82,5 @@ namespace Apps.BWX.Dtos
         public string Status { get; set; }
         public int TasksCompletedCount { get; set; }
         public string Uuid { get; set; }
-    }
-
-    public class Organization
-    {
-        public int Id { get; set; }
-        public string Uuid { get; set; }
-        public string Name { get; set; }
-        public string Country { get; set; }
     }
 }

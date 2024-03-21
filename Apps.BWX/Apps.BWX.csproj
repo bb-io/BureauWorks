@@ -15,8 +15,4 @@
     <PackageReference Include="Blackbird.Applications.SDK.Extensions.FileManagement" Version="1.0.2-alpha1" />
     <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.25" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DataSourceHandlers\EnumDataHandlers\" />
-  </ItemGroup>
 </Project>
