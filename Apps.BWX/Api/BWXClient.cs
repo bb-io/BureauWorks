@@ -18,6 +18,9 @@ public class BWXClient : RestClient
     public async Task<RestResponse> ExecuteWithErrorHandling(RestRequest request)
     {
         var response = await ExecuteAsync(request);
+        if(response.Content.StartsWith('['))
+            return response;
+
         var genericResponse = JsonConvert.DeserializeObject<GenericResponse>(response.Content!);
 
         if (!string.IsNullOrEmpty(genericResponse?.Code))

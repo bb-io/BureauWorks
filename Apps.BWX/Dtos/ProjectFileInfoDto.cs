@@ -15,7 +15,7 @@ namespace Apps.BWX.Dtos
         public string Hash { get; set; }
         public string Notes { get; set; }
         public string SourceLocale { get; set; }
-        public int Creation { get; set; }
+        public long Creation { get; set; }
         public string ProjectUuid { get; set; }
         public Params Params { get; set; }
         public List<string> Workflows { get; set; }
