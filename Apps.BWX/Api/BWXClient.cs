@@ -2,6 +2,7 @@
 using Apps.BWX.Models.Responses;
 using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace Apps.BWX.Api;
@@ -18,7 +19,8 @@ public class BWXClient : RestClient
     public async Task<RestResponse> ExecuteWithErrorHandling(RestRequest request)
     {
         var response = await ExecuteAsync(request);
-        if(response.Content.StartsWith('['))
+        
+        if (!CheckIfJsonObject(response.Content!))
             return response;
 
         var genericResponse = JsonConvert.DeserializeObject<GenericResponse>(response.Content!);
@@ -53,5 +55,16 @@ public class BWXClient : RestClient
         } while (!last);
 
         return result;
+    }
+
+    private bool CheckIfJsonObject(string content)
+    {
+        try
+        {
+            JObject.Parse(content);
+            return true;
+        }
+        catch (Exception _) { }
+        return false;
     }
 }
