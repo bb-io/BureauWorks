@@ -9,10 +9,13 @@ using System.Threading.Tasks;
 
 namespace Apps.BWX.Models.Requests.Project
 {
-    public class GetProjectRequest
+    public class DownloadTranslatedFilesRequest
     {
-        [Display("Project ID")]
-        [DataSource(typeof(ProjectDataHandler))]
-        public string ProjectId { get; set; }
+        [DataSource(typeof(ProjectResourcesDataHandler))]
+        public List<string>? Resources { get; set; }
+
+        [Display("Locales")]
+        [DataSource(typeof(LanguageDataHandler))]
+        public List<string>? Locales { get; set; }
     }
 }

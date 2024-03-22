@@ -14,7 +14,7 @@ public class ConnectionPingChecker : IConnectionValidator
         var request = new BWXRequest("/api/v3/project", Method.Get, authProviders);        
         try
         {
-            var reult = client.Paginate<ProjectDto>(request).Result;
+            var result = client.Paginate<ProjectDto>(request).Result;
             return new ValueTask<ConnectionValidationResponse>(new ConnectionValidationResponse()
             {
                 IsValid = true,
