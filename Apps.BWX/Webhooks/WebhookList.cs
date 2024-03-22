@@ -10,189 +10,174 @@ using Blackbird.Applications.Sdk.Common.Files;
 using Apps.BWX.Api;
 using RestSharp;
 using Apps.BWX.Invocables;
+using Apps.BWX.Webhooks.Payload;
 namespace Apps.BWX.Webhooks;
 
 [WebhookList]
 public class WebhookList : BWXInvocable
 {
-    //private MessageActions MessageActions { get; set; }
+
     public WebhookList(InvocationContext invocationContext) : base(invocationContext)
     {
-        //messageActions = new MessageActions(invocationContext, null);
+
     }
 
-    //private async Task<FileMessageDto?> GetMessage(string channel, string timestamp)
-    //{
-    //    var endpoint =
-    //        $"/conversations.replies?channel={channel}&ts={timestamp}&limit=1&inclusive=true";
-    //    var request = new BWXRequest(endpoint, Method.Get, Creds);
+    [Webhook("On empty project created", Description = "On empty project created")]
+    public async Task<WebhookResponse<NewProjectEvent>> EmptyProjectCreated(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<NewProjectEvent>();
+        var payload = JsonConvert.DeserializeObject<NewProjectEvent>(rawPayload);
+        return new WebhookResponse<NewProjectEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    var response = await Client.ExecuteWithErrorHandling<GetMessageDto>(request);
+    [Webhook("On new project created", Description = "On new project created")]
+    public async Task<WebhookResponse<NewProjectEvent>> NewProjectCreated(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<NewProjectEvent>();
+        var payload = JsonConvert.DeserializeObject<NewProjectEvent>(rawPayload);
+        return new WebhookResponse<NewProjectEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    return response.Messages.Where(x => x.Ts == timestamp).FirstOrDefault();
-    //}
+    [Webhook("On project status changed", Description = "On project status changed")]
+    public async Task<WebhookResponse<ProjectStatusChangedPayload>> ProjectStatusChanged(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<ProjectStatusChangedPayload>();
+        var payload = JsonConvert.DeserializeObject<ProjectStatusChangedPayload>(rawPayload);
+        return new WebhookResponse<ProjectStatusChangedPayload>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //[Webhook("On app mentioned", typeof(AppMentionedHandler), Description = "Triggered when the app is mentioned (@Blackbird)")]
-    //public async Task<WebhookResponse<GetMessageResponse>> AppMentioned(WebhookRequest webhookRequest, [WebhookParameter] ChannelInputParameter input)
-    //{
-    //    var payload = JsonConvert.DeserializeObject<BasePayload<AppMentionedEvent>>(webhookRequest.Body.ToString());
+    [Webhook("On project translation finished", Description = "On project translation finished")]
+    public async Task<WebhookResponse<ProjectTranslationFinishedEvent>> ProjectTranslationFinished(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<ProjectTranslationFinishedEvent>();
+        var payload = JsonConvert.DeserializeObject<ProjectTranslationFinishedEvent>(rawPayload);
+        return new WebhookResponse<ProjectTranslationFinishedEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    if (payload == null)
-    //        throw new Exception("No serializable payload was found in incoming request.");
+    [Webhook("On task assigned", Description = "On task assigned")]
+    public async Task<WebhookResponse<TaskAssinedEvent>> TaskAssigned(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<TaskAssinedEvent>();
+        var payload = JsonConvert.DeserializeObject<TaskAssinedEvent>(rawPayload);
+        return new WebhookResponse<TaskAssinedEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    if (input.ChannelId != null && payload.Event.Channel != input.ChannelId)
-    //        return new WebhookResponse<GetMessageResponse> { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
+    [Webhook("On task status changed", Description = "On task status changed")]
+    public async Task<WebhookResponse<TaskStatusChangedPayload>> TaskStatusChanged(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<TaskStatusChangedPayload>();
+        var payload = JsonConvert.DeserializeObject<TaskStatusChangedPayload>(rawPayload);
+        return new WebhookResponse<TaskStatusChangedPayload>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    var messageWithoutMentionedUser = Regex.Replace(payload.Event.Text, "<@.+> ", "");
+    [Webhook("On work unit status changed", Description = "On work unit status changed")]
+    public async Task<WebhookResponse<WorkUnitStatusChangedEvent>> WorkUnitStatusChanged(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<WorkUnitStatusChangedEvent>();
+        var payload = JsonConvert.DeserializeObject<WorkUnitStatusChangedEvent>(rawPayload);
+        return new WebhookResponse<WorkUnitStatusChangedEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    var completeMessage = await GetMessage(payload.Event.Channel, payload.Event.Ts);
-    //    completeMessage.Text = messageWithoutMentionedUser;
+    [Webhook("On new organization created", Description = "On new organization created")]
+    public async Task<WebhookResponse<NewOrgEvent>> NewOrgCreated(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<NewOrgEvent>();
+        var payload = JsonConvert.DeserializeObject<NewOrgEvent>(rawPayload);
+        return new WebhookResponse<NewOrgEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    return new WebhookResponse<GetMessageResponse>
-    //    {
-    //        HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //        Result = new GetMessageResponse
-    //        {
-    //            MessageText = completeMessage.Text,
-    //            ChannelId = payload.Event.Channel,
-    //            Timestamp = completeMessage.Ts,
-    //            ThreadTimestamp = completeMessage.Thread_ts,
-    //            User = completeMessage.User,
-    //            HasAttachments = completeMessage.Files != null && completeMessage.Files.Any(),
-    //        },
-    //        ReceivedWebhookRequestType = WebhookRequestType.Default,
-    //    };
-    //}
+    [Webhook("On new organization unit created", Description = "On new organization unit created")]
+    public async Task<WebhookResponse<NewOrgEvent>> NewOrgUnitCreated(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<NewOrgEvent>();
+        var payload = JsonConvert.DeserializeObject<NewOrgEvent>(rawPayload);
+        return new WebhookResponse<NewOrgEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //[Webhook("On message", typeof(ChannelMessageHandler), Description = "Triggered whenever any new message is posted")]
-    //public async Task<WebhookResponse<GetMessageResponse>> ChannelMessage(WebhookRequest webhookRequest, [WebhookParameter] OnMessageWebhookParameter input)
-    //{
-    //    var payload = JsonConvert.DeserializeObject<BasePayload<ChannelFileMessageEvent>>(webhookRequest.Body.ToString());
+    [Webhook("On new user created", Description = "On new user created")]
+    public async Task<WebhookResponse<NewUserEvent>> NewUserCreated(WebhookRequest webhookRequest)
+    {
+        var rawPayload = webhookRequest.Body.ToString();
+        if (rawPayload == "{}")
+            return GeneratePreflight<NewUserEvent>();
+        var payload = JsonConvert.DeserializeObject<NewUserEvent>(rawPayload);
+        return new WebhookResponse<NewUserEvent>
+        {
+            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
+            Result = payload,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
+        };
+    }
 
-    //    if (payload == null)
-    //        throw new Exception("No serializable payload was found in incoming request.");
-
-    //    if (input.ChannelId != null && payload.Event.Channel != input.ChannelId)
-    //        return new WebhookResponse<GetMessageResponse> { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
-
-    //    var completeMessage = await GetMessage(payload.Event.Channel, payload.Event.Ts);
-
-    //    var isReply = completeMessage.Thread_ts != null;
-
-    //    if (input.ReplyHandling == "no_replies" && isReply)
-    //        return new WebhookResponse<GetMessageResponse>()
-    //        {
-    //            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //            ReceivedWebhookRequestType = WebhookRequestType.Preflight
-    //        };
-
-    //    if (input.ReplyHandling == "only_replies" && !isReply)
-    //        return new WebhookResponse<GetMessageResponse>()
-    //        {
-    //            HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //            ReceivedWebhookRequestType = WebhookRequestType.Preflight
-    //        };
-
-    //    var hasFiles = completeMessage?.Files != null && completeMessage.Files.Any();
-
-    //    if (input.TriggerOnlyOnFiles is true && !hasFiles)
-    //        return new WebhookResponse<GetMessageResponse>() { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
-
-    //    return new WebhookResponse<GetMessageResponse>
-    //    {
-    //        HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //        Result = new GetMessageResponse
-    //        {
-    //            MessageText = completeMessage.Text,
-    //            ChannelId = payload.Event.Channel,
-    //            Timestamp = completeMessage.Ts,
-    //            ThreadTimestamp = completeMessage.Thread_ts,
-    //            User = completeMessage.User,
-    //            HasAttachments = hasFiles,
-    //        },
-    //        ReceivedWebhookRequestType = WebhookRequestType.Default,
-    //    };
-    //}   
-
-    //[Webhook("On member joined channel", typeof(MemberJoinedChannelHandler), Description = "Triggered when a member joins a channel")]
-    //public Task<WebhookResponse<MemberJoinedEvent>> MemberJoinedChannel(WebhookRequest webhookRequest)
-    //{
-    //    var payload = JsonConvert.DeserializeObject<BasePayload<MemberJoinedEvent>>(webhookRequest.Body.ToString());
-
-    //    if (payload == null)
-    //        throw new Exception("No serializable payload was found in incoming request.");
-
-    //    return Task.FromResult(new WebhookResponse<MemberJoinedEvent>
-    //    {
-    //        HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //        Result = payload.Event,
-    //    });
-    //}
-
-    //[Webhook("On reaction added", typeof(MessageReactionHandler), Description = "Triggered whenever someone reacts to a message with an emoji")]
-    //public async Task<WebhookResponse<ChannelMessageWithReaction>> MessageReaction(WebhookRequest webhookRequest, [WebhookParameter] ChannelInputParameter input, [WebhookParameter] OptionalEmojiInput emoji)
-    //{
-    //    var payload = JsonConvert.DeserializeObject<BasePayload<MessageReactionEvent>>(webhookRequest.Body.ToString());
-
-    //    if (payload == null)
-    //        throw new Exception("No serializable payload was found in incoming request.");
-
-    //    if (input.ChannelId != null && payload.Event.Item.Channel != input.ChannelId)
-    //        return new WebhookResponse<ChannelMessageWithReaction> { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
-
-    //    if (emoji.Reaction != null && payload.Event.Reaction != emoji.Reaction)
-    //        return new WebhookResponse<ChannelMessageWithReaction> { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
-
-    //    var completeMessage = await GetMessage(input.ChannelId, payload.Event.Item.Ts);
-
-    //    return new WebhookResponse<ChannelMessageWithReaction>
-    //    {
-    //        HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //        Result = new ChannelMessageWithReaction
-    //        {
-    //            MessageText = completeMessage.Text,
-    //            ChannelId = payload.Event.Item.Channel,
-    //            Timestamp = completeMessage.Ts,
-    //            ThreadTimestamp = completeMessage.Thread_ts,
-    //            User = completeMessage.User,
-    //            HasAttachments = completeMessage.Files != null && completeMessage.Files.Any(),
-    //            Reaction = payload.Event.Reaction,
-    //        },
-    //        ReceivedWebhookRequestType = WebhookRequestType.Default,
-    //    };
-    //}
-
-    // Todo: For some reason this doesn't trigger
-
-    //[Webhook("On reaction removed", typeof(ReactionRemovedHandler), Description = "Triggered whenever someone removed a reaction from a message")]
-    //public async Task<WebhookResponse<ChannelMessageWithReaction>> MessageReactionRemoved(WebhookRequest webhookRequest, [WebhookParameter] ChannelInputParameter input, [WebhookParameter] OptionalEmojiInput emoji)
-    //{
-    //    var payload = JsonConvert.DeserializeObject<BasePayload<MessageReactionEvent>>(webhookRequest.Body.ToString());
-
-    //    if (payload == null)
-    //        throw new Exception("No serializable payload was found in incoming request.");
-
-    //    if (input.ChannelId != null && payload.Event.Item.Channel != input.ChannelId)
-    //        return new WebhookResponse<ChannelMessageWithReaction> { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
-
-    //    if (emoji.Reaction != null && payload.Event.Reaction != emoji.Reaction)
-    //        return new WebhookResponse<ChannelMessageWithReaction> { HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK), ReceivedWebhookRequestType = WebhookRequestType.Preflight };
-
-    //    var completeMessage = await MessageActions.GetMessageFiles(new Models.Requests.Message.GetMessageParameters { ChannelId = payload.Event.Item.Channel, Timestamp = payload.Event.Item.Ts });
-
-    //    return new WebhookResponse<ChannelMessageWithReaction>
-    //    {
-    //        HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
-    //        Result = new ChannelMessageWithReaction
-    //        {
-    //            ChannelId = completeMessage.ChannelId,
-    //            Timestamp = completeMessage.Timestamp,
-    //            User = completeMessage.User,
-    //            MessageText = completeMessage.MessageText,
-    //            FilesUrls = completeMessage.FilesUrls,
-    //            Reaction = payload.Event.Reaction,
-    //        },
-    //        ReceivedWebhookRequestType = WebhookRequestType.Default,
-    //    };
-    //}
+    private WebhookResponse<T> GeneratePreflight<T>() where T : class
+    {
+        return new WebhookResponse<T>
+        {
+            ReceivedWebhookRequestType = WebhookRequestType.Preflight,
+            HttpResponseMessage = new HttpResponseMessage(statusCode: HttpStatusCode.OK)
+        };
+    }
 }
