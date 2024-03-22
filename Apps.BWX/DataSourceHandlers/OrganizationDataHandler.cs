@@ -4,11 +4,13 @@ using Apps.BWX.Invocables;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+/** !!!Warning!!! 
+ *  Since BWX API is the same API their web platform uses 
+ *  and many endpoints are not described or irrelevant in BWX API documentation - 
+ *  some parts of code are based on the endpoints which are used by BWX web platform. (It could be both v3 or v2 endpoints)
+ *  Next method is based on web platform calls
+ **/
 
 namespace Apps.BWX.DataSourceHandlers
 {

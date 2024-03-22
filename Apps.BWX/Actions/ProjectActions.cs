@@ -11,6 +11,7 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using RestSharp;
 using System.IO.Compression;
+using Newtonsoft.Json;
 
 namespace Apps.BWX.Actions;
 
@@ -81,7 +82,7 @@ public class ProjectActions : BWXInvocable
     }
 
     [Action("Upload file to project", Description = "Upload file to project")]
-    public async Task<ProjectFileInfoDto> UploadFileToProject(
+    public async Task<WorkUnitDto> UploadFileToProject(
         [ActionParameter] GetProjectRequest getProjectRequest, 
         [ActionParameter] UploadFileRequest uploadFileRequest)
     {
@@ -94,10 +95,22 @@ public class ProjectActions : BWXInvocable
         });
         var projectFileInfoDto = await Client.ExecuteWithErrorHandling<ProjectFileInfoDto>(request);
 
-        var uploadRequest = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource/{projectFileInfoDto.Uuid}/content", Method.Post, Creds);
+        var uploadRequest = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource/{projectFileInfoDto.Uuid}/content", Method.Put, Creds);
         var fileBytes = await (await _fileManagementClient.DownloadAsync(uploadFileRequest.File)).GetByteData();
+        uploadRequest.AlwaysMultipartFormData = true;
         uploadRequest.AddFile("file", fileBytes, uploadFileRequest.File.Name);
         await Client.ExecuteWithErrorHandling(uploadRequest);
-        return projectFileInfoDto;
+
+        var createWorkUnitRequest = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/work-unit?bulk=true", Method.Post, Creds);
+        createWorkUnitRequest.AddJsonBody(JsonConvert.SerializeObject(
+            new List<WorkUnitCreateDto>() { 
+                new WorkUnitCreateDto()
+                {
+                    ProjectResourceUuid = projectFileInfoDto.Uuid,
+                    Workflows = uploadFileRequest.Workflows,
+                    TargetLocales = uploadFileRequest.TargetLocales,
+                } 
+            }));
+        return (await Client.ExecuteWithErrorHandling<List<WorkUnitDto>>(createWorkUnitRequest)).First();
     }
 }
