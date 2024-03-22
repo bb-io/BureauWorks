@@ -1,7 +1,5 @@
 ﻿using Apps.BWX.Api;
-using Apps.BWX.Constants;
 using Apps.BWX.Dtos;
-using Apps.BWX.Extensions;
 using Apps.BWX.Invocables;
 using Apps.BWX.Models.Requests.Project;
 using Blackbird.Applications.Sdk.Common;
@@ -10,8 +8,8 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using RestSharp;
-using System.IO.Compression;
 using Newtonsoft.Json;
+using Apps.BWX.Models.Responses.Project;
 
 namespace Apps.BWX.Actions;
 
@@ -59,14 +57,14 @@ public class ProjectActions : BWXInvocable
     }
 
     [Action("Get project", Description = "Get project")]
-    public Task<ProjectDto> GetProject([ActionParameter] GetProjectRequest input)
+    public async Task<ProjectDto> GetProject([ActionParameter] GetProjectRequest input)
     {
         var request = new BWXRequest($"/api/v3/project/{input.ProjectId}", Method.Get, Creds);
-        return Client.ExecuteWithErrorHandling<ProjectDto>(request);
+        return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
     [Action("Create project", Description = "Create project")]
-    public Task<ProjectDto> CreateProject([ActionParameter] CreateProjectRequest input)
+    public async Task<ProjectDto> CreateProject([ActionParameter] CreateProjectRequest input)
     {
         var request = new BWXRequest($"/api/v3/project?inferDefaultSettings={input?.InferDefaultSettings?.ToString().ToLower() ?? "true"}", Method.Post, Creds);
         request.AddJsonBody(new
@@ -78,7 +76,7 @@ public class ProjectActions : BWXInvocable
             notes = input.Notes,
             tags = input.Tags,
         });
-        return Client.ExecuteWithErrorHandling<ProjectDto>(request);
+        return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
     [Action("Upload file to project", Description = "Upload file to project")]
@@ -112,5 +110,47 @@ public class ProjectActions : BWXInvocable
                 } 
             }));
         return (await Client.ExecuteWithErrorHandling<List<WorkUnitDto>>(createWorkUnitRequest)).First();
+    }
+
+    [Action("Change project status", Description = "Change project status")]
+    public async Task<ProjectDto> ChangeProjectStatus(
+        [ActionParameter] GetProjectRequest getProjectRequest,
+        [ActionParameter] ChangeProjectStatusRequest changeProjectStatusRequest)
+    {
+        var request = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/status", Method.Post, Creds);
+        request.AddJsonBody(new
+        {
+            newStatus = changeProjectStatusRequest.ProjectStatus,
+            reason = changeProjectStatusRequest.Reason
+        });
+        return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
+    }
+
+    [Action("Download translated files", Description = "Download translated files")]
+    public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
+        [ActionParameter] GetProjectRequest getProjectRequest,
+        [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
+    {
+        var request = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/download", Method.Get, Creds);
+
+        if (downloadTranslatedFilesRequest.Resources != null && downloadTranslatedFilesRequest.Resources.Any())
+            foreach (var resourceId in downloadTranslatedFilesRequest.Resources)
+                request.AddQueryParameter("resources", resourceId);
+
+        if (downloadTranslatedFilesRequest.Locales != null && downloadTranslatedFilesRequest.Locales.Any())
+            foreach (var locale in downloadTranslatedFilesRequest.Locales)
+                request.AddQueryParameter("locales", locale);
+
+        var result = await Client.ExecuteWithErrorHandling(request);
+        using var resultStream = new MemoryStream(result.RawBytes);
+        var files = await resultStream.GetFilesFromZip();
+
+        var translatedFiles = new DownloadTranslatedFilesResponse();
+        foreach(var file in files)
+        {
+           var uploadedFile = await _fileManagementClient.UploadAsync(file.FileStream, MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), file.UploadName);
+           translatedFiles.TranslatedFiles.Add(uploadedFile);
+        }
+        return translatedFiles;
     }
 }
