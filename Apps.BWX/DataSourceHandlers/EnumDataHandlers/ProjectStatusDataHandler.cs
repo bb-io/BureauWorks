@@ -1,21 +1,16 @@
-﻿using Blackbird.Applications.Sdk.Utils.Sdk.DataSourceHandlers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
 
-namespace Apps.BWX.DataSourceHandlers.EnumDataHandlers
+namespace Apps.BWX.DataSourceHandlers.EnumDataHandlers;
+
+public class ProjectStatusDataHandler : IStaticDataSourceHandler
 {
-    public class ProjectStatusDataHandler : EnumDataHandler
+    public Dictionary<string, string> GetData()
+     => new()
     {
-        protected override Dictionary<string, string> EnumValues => new()
-            {
-                {"Draft", "Draft"},
-                {"Pending", "Pending"},
-                {"Approved", "Approved"},
-                {"Delivered", "Delivered"},
-                {"Invoiced", "Invoiced"},
-            };
-    }
+        {"Draft", "Draft"},
+        {"Pending", "Pending"},
+        {"Approved", "Approved"},
+        {"Delivered", "Delivered"},
+        {"Invoiced", "Invoiced"},
+    };
 }

@@ -12,23 +12,22 @@ using RestSharp;
  *  Next method is based on web platform calls
  **/
 
-namespace Apps.BWX.DataSourceHandlers
+namespace Apps.BWX.DataSourceHandlers;
+
+public class ClientDataHandler : BWXInvocable, IAsyncDataSourceHandler
 {
-    public class ClientDataHandler : BWXInvocable, IAsyncDataSourceHandler
+    public ClientDataHandler(InvocationContext invocationContext) : base(invocationContext)
     {
-        public ClientDataHandler(InvocationContext invocationContext) : base(invocationContext)
-        {
-        }
+    }
 
-        public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
-        {
-            var request = new BWXRequest($"/api/v3/client", Method.Get, Creds);
-            var languages = await Client.Paginate<ClientDto>(request);
+    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
+    {
+        var request = new BWXRequest($"/api/v3/client", Method.Get, Creds);
+        var languages = await Client.Paginate<ClientDto>(request);
 
-            return languages.Where(el =>
-                    context.SearchString is null ||
-                    el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-                .ToDictionary(k => k.Uuid, v => v.Name);
-        }
+        return languages.Where(el =>
+                context.SearchString is null ||
+                el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(k => k.Uuid, v => v.Name);
     }
 }
