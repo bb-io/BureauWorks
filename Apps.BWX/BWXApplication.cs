@@ -7,7 +7,7 @@ public class BWXApplication : IApplication, ICategoryProvider
 {
     public IEnumerable<ApplicationCategory> Categories
     {
-        get => [ApplicationCategory.CatAndTms];
+        get => [ApplicationCategory.CatAndTms, ApplicationCategory.TranslationBusinessManagement];
         set { }
     }
     
