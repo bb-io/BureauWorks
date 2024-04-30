@@ -1,20 +1,14 @@
 ﻿using Apps.BWX.DataSourceHandlers.EnumDataHandlers;
 using Blackbird.Applications.Sdk.Common;
-using Blackbird.Applications.Sdk.Common.Dynamic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
-namespace Apps.BWX.Models.Requests.Project
+namespace Apps.BWX.Models.Requests.Project;
+
+public class ChangeProjectStatusRequest
 {
-    public class ChangeProjectStatusRequest
-    {
-        [Display("Project status")]
-        [DataSource(typeof(ProjectStatusDataHandler))]
-        public string ProjectStatus { get; set; }
+    [Display("Project status")]
+    [StaticDataSource(typeof(ProjectStatusDataHandler))]
+    public string ProjectStatus { get; set; }
 
-        public string Reason { get; set; }
-    }
+    public string Reason { get; set; }
 }

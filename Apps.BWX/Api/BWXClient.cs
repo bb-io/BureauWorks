@@ -1,6 +1,5 @@
 ﻿using Apps.BWX.Constants;
 using Apps.BWX.Models.Responses;
-using Blackbird.Applications.Sdk.Utils.Extensions.String;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
