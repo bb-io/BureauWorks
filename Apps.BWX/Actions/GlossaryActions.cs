@@ -77,7 +77,7 @@ public class GlossaryActions : BWXInvocable
         var fileTBXV2Stream = await fileStream.ConvertFromTbxV3ToV2();
 
         var initImportRequest = new BWXRequest($"/api/v3/glossary/{input.GlossaryId}/import-tbx", Method.Post, Creds);
-        initImportRequest.AddFile("file", await fileTBXV2Stream.GetByteData(), input.File.Name);
+        initImportRequest.AddFile("tbxFile", await fileTBXV2Stream.GetByteData(), input.File.Name);
 
         await Client.ExecuteWithErrorHandling(initImportRequest);
     }
