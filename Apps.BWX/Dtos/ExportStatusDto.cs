@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,8 @@ namespace Apps.BWX.Dtos
     {
         public string RequestUuid { get; set; }
         public string Status { get; set; }
+
+        [JsonProperty("downloadUrl")]
         public string DownloadUrl { get; set; }
     }
 }

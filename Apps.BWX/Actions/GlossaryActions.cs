@@ -3,7 +3,6 @@ using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
 using Apps.BWX.Models.Glossary.Requests;
 using Apps.BWX.Models.Glossary.Responses;
-using Apps.BWX.Models.Project.Requests;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
