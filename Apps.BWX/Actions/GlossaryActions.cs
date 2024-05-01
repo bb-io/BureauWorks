@@ -3,10 +3,12 @@ using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
 using Apps.BWX.Models.Glossary.Requests;
 using Apps.BWX.Models.Glossary.Responses;
+using Apps.BWX.Models.Project.Requests;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Glossaries.Utils.Converters;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using RestSharp;
 using System.Net.Mime;
@@ -68,21 +70,17 @@ public class GlossaryActions : BWXInvocable
         return new ExportGlossaryResponse() { File = await _fileManagementClient.UploadAsync(resultStream, MediaTypeNames.Application.Xml, $"{glossaryInfo.Name}.tbx") };
     }
 
-    //[Action("Import glossary", Description = "Import glossary")]
-    //public async Task ImportGlossary([ActionParameter] ImportGlossaryRequest input)
-    //{
-    //    var client = new PhraseTmsClient(InvocationContext.AuthenticationCredentialsProviders);
+    [Action("Import glossary", Description = "Import glossary")]
+    public async Task ImportGlossary([ActionParameter] ImportGlossaryRequest input)
+    {
+        var fileStream = await _fileManagementClient.DownloadAsync(input.File);
+        var fileTBXV2Stream = await fileStream.ConvertFromTbxV3ToV2();
 
-    //    var fileStream = await _fileManagementClient.DownloadAsync(input.File);
-    //    var fileTBXV2Stream = await fileStream.ConvertFromTBXV3ToV2();
+        var initImportRequest = new BWXRequest($"/api/v3/glossary/{input.GlossaryId}/import-tbx", Method.Post, Creds);
+        initImportRequest.AddFile("file", await fileTBXV2Stream.GetByteData(), input.File.Name);
 
-    //    var endpointGlossaryData = $"/api2/v1/termBases/{input.GlossaryUId}/upload";
-    //    var requestGlossaryData = new PhraseTmsRequest(endpointGlossaryData.WithQuery(new { updateTerms = false }), Method.Post, InvocationContext.AuthenticationCredentialsProviders);
-    //    requestGlossaryData.AddHeader("Content-Disposition", $"filename*=UTF-8''{input.File.Name}");
-    //    requestGlossaryData.AddParameter("application/octet-stream", fileTBXV2Stream.GetByteData().Result, ParameterType.RequestBody);
-
-    //    await client.ExecuteWithHandling(requestGlossaryData);
-    //}
+        await Client.ExecuteWithErrorHandling(initImportRequest);
+    }
 
     private async Task<GlossaryDto> GetGlossary([ActionParameter] ExportGlossaryRequest input)
     {
