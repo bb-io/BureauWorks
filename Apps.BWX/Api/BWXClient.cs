@@ -1,5 +1,5 @@
 ﻿using Apps.BWX.Constants;
-using Apps.BWX.Models.Responses;
+using Apps.BWX.Models.Project.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;

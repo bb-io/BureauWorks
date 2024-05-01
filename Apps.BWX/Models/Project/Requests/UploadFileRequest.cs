@@ -5,7 +5,7 @@ using Blackbird.Applications.Sdk.Common.Dictionaries;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Files;
 
-namespace Apps.BWX.Models.Requests.Project;
+namespace Apps.BWX.Models.Project.Requests;
 
 public class UploadFileRequest
 {

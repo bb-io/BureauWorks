@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Apps.BWX.Models.Responses;
+namespace Apps.BWX.Models.Project.Responses;
 
 public class GenericResponse
 {
