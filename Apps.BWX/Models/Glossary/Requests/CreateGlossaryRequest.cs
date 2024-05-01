@@ -14,7 +14,7 @@ namespace Apps.BWX.Models.Glossary.Requests
         public string Name { get; set; }
 
         [DataSource(typeof(LanguageDataHandler))]
-        public string Languages { get; set; }
+        public List<string> Languages { get; set; }
 
         [DataSource(typeof(OrganizationDataHandler))]
         public string Organization { get; set; }
