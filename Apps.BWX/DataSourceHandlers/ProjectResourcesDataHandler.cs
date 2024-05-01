@@ -1,34 +1,40 @@
 ﻿using Apps.BWX.Api;
 using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
-using Apps.BWX.Models.Requests.Project;
+using Apps.BWX.Models.Project.Requests;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Apps.BWX.DataSourceHandlers;
-
-public class ProjectResourcesDataHandler : BWXInvocable, IAsyncDataSourceHandler
+namespace Apps.BWX.DataSourceHandlers
 {
-    public GetProjectRequest ProjectRequest { get; set; }
-
-    public ProjectResourcesDataHandler(InvocationContext invocationContext, [ActionParameter] GetProjectRequest projectRequest) : base(invocationContext)
+    public class ProjectResourcesDataHandler : BWXInvocable, IAsyncDataSourceHandler
     {
-        ProjectRequest = projectRequest;
-    }
+        public GetProjectRequest ProjectRequest { get; set; }
 
-    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
-    {
-        if (string.IsNullOrEmpty(ProjectRequest?.ProjectId))
-            throw new ArgumentException("Please select project first!");
+        public ProjectResourcesDataHandler(InvocationContext invocationContext, [ActionParameter] GetProjectRequest projectRequest) : base(invocationContext)
+        {
+            ProjectRequest = projectRequest;
+        }
 
-        var request = new BWXRequest($"/api/v3/project/{ProjectRequest.ProjectId}/resource/simple", Method.Get, Creds);
-        var projectResources = await Client.ExecuteWithErrorHandling<List<ProjectResourceDto>>(request);
+        public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
+        {
+            if (string.IsNullOrEmpty(ProjectRequest?.ProjectId))
+                throw new ArgumentException("Please select project first!");
 
-        return projectResources.Where(el =>
-                context.SearchString is null ||
-                el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(k => k.Uuid, v => v.Name);
+            var request = new BWXRequest($"/api/v3/project/{ProjectRequest.ProjectId}/resource/simple", Method.Get, Creds);
+            var projectResources = await Client.ExecuteWithErrorHandling<List<ProjectResourceDto>>(request);
+
+            return projectResources.Where(el =>
+                    context.SearchString is null ||
+                    el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(k => k.Uuid, v => v.Name);
+        }
     }
 }

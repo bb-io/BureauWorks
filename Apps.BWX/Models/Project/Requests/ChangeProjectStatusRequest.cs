@@ -2,7 +2,7 @@
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
 
-namespace Apps.BWX.Models.Requests.Project;
+namespace Apps.BWX.Models.Project.Requests;
 
 public class ChangeProjectStatusRequest
 {

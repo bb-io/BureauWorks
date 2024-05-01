@@ -1,7 +1,6 @@
 ﻿using Apps.BWX.Api;
 using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
-using Apps.BWX.Models.Requests.Project;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -9,7 +8,8 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using RestSharp;
 using Newtonsoft.Json;
-using Apps.BWX.Models.Responses.Project;
+using Apps.BWX.Models.Project.Responses;
+using Apps.BWX.Models.Project.Requests;
 
 namespace Apps.BWX.Actions;
 
