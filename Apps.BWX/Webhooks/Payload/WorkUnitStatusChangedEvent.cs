@@ -48,8 +48,8 @@ public class WorkUnitStatusChangedEvent
     [JsonProperty("project_file_name")]
     public string ProjectFileName { get; set; }
 
-    [Display("Project step level", NullValueHandling = NullValueHandling.Ignore)]
-    [JsonProperty("project_step_level")]
+    [Display("Project step level")]
+    [JsonProperty("project_step_level", NullValueHandling = NullValueHandling.Ignore)]
     public int ProjectStepLevel { get; set; }
 
     [Display("Source locale")]
