@@ -19,15 +19,15 @@ public class ProjectTranslationFinishedEvent
     public string ProjectName { get; set; }
 
     [Display("Total work units completed")]
-    [JsonProperty("total_work_units_completed")]
+    [JsonProperty("total_work_units_completed", NullValueHandling = NullValueHandling.Ignore)]
     public int TotalWorkUnitsCompleted { get; set; }
 
     [Display("Total work units failed")]
-    [JsonProperty("total_work_units_failed")]
+    [JsonProperty("total_work_units_failed", NullValueHandling = NullValueHandling.Ignore)]
     public int TotalWorkUnitsFailed { get; set; }
 
     [Display("Total work units")]
-    [JsonProperty("total_work_units")]
+    [JsonProperty("total_work_units", NullValueHandling = NullValueHandling.Ignore)]
     public int TotalWorkUnits { get; set; }
 
     [Display("Event type")]

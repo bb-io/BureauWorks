@@ -33,11 +33,11 @@ public class TaskAssignedEvent
     public string AssigneeEmail { get; set; }
 
     [Display("Assignee word rate")]
-    [JsonProperty("assignee_word_rate")]
+    [JsonProperty("assignee_word_rate", NullValueHandling = NullValueHandling.Ignore)]
     public double AssigneeWordRate { get; set; }
 
     [Display("Begin index")]
-    [JsonProperty("begin_index")]
+    [JsonProperty("begin_index", NullValueHandling = NullValueHandling.Ignore)]
     public long BeginIndex { get; set; }
 
     //[Display("Creation timestamp")]
@@ -78,7 +78,7 @@ public class TaskAssignedEvent
     public string Instructions { get; set; }
 
     [Display("Minimum score required")]
-    [JsonProperty("minimum_score_required")]
+    [JsonProperty("minimum_score_required", NullValueHandling = NullValueHandling.Ignore)]
     public double MinimumScoreRequired { get; set; }
 
     [JsonProperty("name")]
