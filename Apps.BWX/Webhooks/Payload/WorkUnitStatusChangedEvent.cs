@@ -10,18 +10,18 @@ public class WorkUnitStatusChangedEvent
     public string Id { get; set; }
 
     [Display("Begin index")]
-    [JsonProperty("begin_index")]
+    [JsonProperty("begin_index", NullValueHandling = NullValueHandling.Ignore)]
     public int BeginIndex { get; set; }
 
     [JsonProperty("chars")]
     public int Chars { get; set; }
 
     [Display("Confirmed non translatable")]
-    [JsonProperty("confirmed_non_translatable")]
+    [JsonProperty("confirmed_non_translatable", NullValueHandling = NullValueHandling.Ignore)]
     public int ConfirmedNonTranslatable { get; set; }
 
     [Display("Confirmed segments")]
-    [JsonProperty("confirmed_segments")]
+    [JsonProperty("confirmed_segments", NullValueHandling = NullValueHandling.Ignore)]
     public int ConfirmedSegments { get; set; }
 
     [Display("End index")]
@@ -48,7 +48,7 @@ public class WorkUnitStatusChangedEvent
     [JsonProperty("project_file_name")]
     public string ProjectFileName { get; set; }
 
-    [Display("Project step level")]
+    [Display("Project step level", NullValueHandling = NullValueHandling.Ignore)]
     [JsonProperty("project_step_level")]
     public int ProjectStepLevel { get; set; }
 
@@ -65,14 +65,14 @@ public class WorkUnitStatusChangedEvent
     public int TotalNonTranslatable { get; set; }
 
     [Display("Total segments")]
-    [JsonProperty("total_segments")]
+    [JsonProperty("total_segments", NullValueHandling = NullValueHandling.Ignore)]
     public int TotalSegments { get; set; }
 
     [Display("Translated file url")]
     [JsonProperty("translated_file_url")]
     public string TranslatedFileUrl { get; set; }
 
-    [JsonProperty("words")]
+    [JsonProperty("words", NullValueHandling = NullValueHandling.Ignore)]
     public int Words { get; set; }
 
     [JsonProperty("workflow")]
