@@ -12,7 +12,7 @@ namespace Apps.BWX.Models.Glossary.Requests
 {
     public class ImportGlossaryRequest
     {
-        [Display("Glossary", Description = "Existing glossary for import")]
+        [Display("Glossary ID", Description = "Existing glossary for import")]
         [DataSource(typeof(GlossaryDataHandler))]
         public string GlossaryId { get; set; }
 

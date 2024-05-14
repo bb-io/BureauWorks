@@ -76,13 +76,13 @@ public class WebhookList : BWXInvocable
     }
 
     [Webhook("On task assigned", Description = "On task assigned")]
-    public async Task<WebhookResponse<TaskAssinedEvent>> TaskAssigned(WebhookRequest webhookRequest)
+    public async Task<WebhookResponse<TaskAssignedEvent>> TaskAssigned(WebhookRequest webhookRequest)
     {
         var rawPayload = webhookRequest.Body.ToString();
         if (rawPayload == "{}")
-            return GeneratePreflight<TaskAssinedEvent>();
-        var payload = JsonConvert.DeserializeObject<TaskAssinedEvent>(rawPayload);
-        return new WebhookResponse<TaskAssinedEvent>
+            return GeneratePreflight<TaskAssignedEvent>();
+        var payload = JsonConvert.DeserializeObject<TaskAssignedEvent>(rawPayload);
+        return new WebhookResponse<TaskAssignedEvent>
         {
             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
             Result = payload,
