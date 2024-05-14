@@ -4,6 +4,9 @@ namespace Apps.BWX.Webhooks.Payload;
 
 public class ProjectStatusChangedPayload
 {
+    [Display("Project ID")]
+    public string Uuid { get; set; }
+
     [Display("Creation timestamp")]
     public long CreationTimestamp { get; set; }
     public string Creator { get; set; }
@@ -14,8 +17,8 @@ public class ProjectStatusChangedPayload
     [Display("Event type")]
     public string EventType { get; set; }
 
-    [Display("ID")]
-    public int Id { get; set; }
+    //[Display("ID")]
+    //public int Id { get; set; }
     public string Instructions { get; set; }
     public string Name { get; set; }
 
@@ -34,9 +37,6 @@ public class ProjectStatusChangedPayload
 
     [Display("Target locales")]
     public List<string> TargetLocales { get; set; }
-
-    [Display("UUID")]
-    public string Uuid { get; set; }
     public List<string> Workflows { get; set; }
 
     [Display("Custom fields")]

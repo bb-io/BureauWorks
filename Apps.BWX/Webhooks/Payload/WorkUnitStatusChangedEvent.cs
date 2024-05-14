@@ -4,6 +4,9 @@ namespace Apps.BWX.Webhooks.Payload;
 
 public class WorkUnitStatusChangedEvent
 {
+    [Display("Work unit ID")]
+    public string Id { get; set; }
+
     [Display("Begin index")]
     public int BeginIndex { get; set; }
     public int Chars { get; set; }
@@ -19,9 +22,6 @@ public class WorkUnitStatusChangedEvent
 
     [Display("Event type")]
     public string EventType { get; set; }
-
-    [Display("ID")]
-    public string Id { get; set; }
 
     [Display("New status")]
     public string NewStatus { get; set; }

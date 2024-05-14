@@ -4,7 +4,7 @@ namespace Apps.BWX.Dtos;
 
 public class ProjectDto
 {
-    [Display("UUID")]
+    [Display("Project ID")]
     public string Uuid { get; set; }
     public string Name { get; set; }
     public string Reference { get; set; }
@@ -19,14 +19,14 @@ public class ProjectDto
     [Display("Target locales")]
     public List<string> TargetLocales { get; set; }
 
-    [Display("Is continuous")]
+    [Display("Is continuous?")]
     public bool IsContinuous { get; set; }
 
-    [Display("Create date")]
-    public long CreateDate { get; set; }
+    //[Display("Create date")]
+    //public long CreateDate { get; set; }
 
-    [Display("Due date")]
-    public long DueDate { get; set; }
+    //[Display("Due date")]
+    //public long DueDate { get; set; }
     public string Status { get; set; }
     public Client Client { get; set; }
     public Contact Contact { get; set; }
@@ -60,7 +60,7 @@ public class ProjectDto
 
 public class Client
 {
-    [Display("UUID")]
+    [Display("Client ID")]
     public string Uuid { get; set; }
     public OrganizationDto Organization { get; set; }
     public string Name { get; set; }
@@ -74,6 +74,9 @@ public class Client
 
 public class Contact
 {
+    [Display("Contact ID")]
+    public string Uuid { get; set; }
+
     public string Email { get; set; }
     public string Name { get; set; }
     public string Status { get; set; }
@@ -81,16 +84,14 @@ public class Contact
     [Display("Tasks completed count")]
     public int TasksCompletedCount { get; set; }
 
-    [Display("UUID")]
-    public string Uuid { get; set; }
 }
 
 public class Cost
 {
-    [Display("ID")]
-    public int Id { get; set; }
+    //[Display("ID")]
+    //public int Id { get; set; }
 
-    [Display("UUID")]
+    [Display("Cost ID")]
     public string Uuid { get; set; }
     public string Description { get; set; }
 
@@ -105,8 +106,8 @@ public class Cost
     [Display("Costs log file ID")]
     public string CostsLogfileId { get; set; }
 
-    [Display("Creation timestamp")]
-    public long CreationTimestamp { get; set; }
+    //[Display("Creation timestamp")]
+    //public long CreationTimestamp { get; set; }
 
     [Display("Match start")]
     public int MatchStart { get; set; }
@@ -134,6 +135,8 @@ public class Cost
 
 public class Creator
 {
+    [Display("Creator ID")]
+    public string Uuid { get; set; }
     public string Email { get; set; }
     public string Name { get; set; }
     public string Status { get; set; }
@@ -141,6 +144,4 @@ public class Creator
     [Display("Tasks completed count")]
     public int TasksCompletedCount { get; set; }
 
-    [Display("UUID")]
-    public string Uuid { get; set; }
 }

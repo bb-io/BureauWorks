@@ -2,7 +2,7 @@
 
 namespace Apps.BWX.Webhooks.Payload;
 
-public class TaskStatusChangedPayload : TaskAssinedEvent
+public class TaskStatusChangedPayload : TaskAssignedEvent
 {
     [Display("New status")]
     public string NewStatus { get; set; }

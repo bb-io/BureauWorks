@@ -12,7 +12,7 @@ public class CreateProjectRequest
     [DataSource(typeof(ClientDataHandler))]
     public string OrgUnitUUID { get; set; }
 
-    [Display("Contact person")]
+    [Display("Contact person ID")]
     [DataSource(typeof(UserDataHandler))]
     public string ContactUUID { get; set; }
 

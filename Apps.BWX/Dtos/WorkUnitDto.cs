@@ -4,7 +4,7 @@ namespace Apps.BWX.Dtos;
 
 public class WorkUnitDto
 {
-    [Display("UUID")]
+    [Display("Work unit ID")]
     public string Uuid { get; set; }
 
     [Display("Work ID")]
@@ -18,17 +18,17 @@ public class WorkUnitDto
     public string TargetLanguage { get; set; }
     public string Filename { get; set; }
 
-    [Display("Creation timestamp")]
-    public long CreationTimestamp { get; set; }
+    //[Display("Creation timestamp")]
+    //public long CreationTimestamp { get; set; }
 
-    [Display("Last update")]
-    public long LastUpdate { get; set; }
+    //[Display("Last update")]
+    //public long LastUpdate { get; set; }
     public int Sequence { get; set; }
     public string Workflow { get; set; }
 
-    [Display("Project UUID")]
+    [Display("Project ID")]
     public string ProjectUUID { get; set; }
 
-    [Display("Project resource UUID")]
+    [Display("Project resource ID")]
     public string ProjectResourceUuid { get; set; }
 }

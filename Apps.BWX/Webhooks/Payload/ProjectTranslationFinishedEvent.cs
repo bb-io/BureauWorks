@@ -5,10 +5,10 @@ namespace Apps.BWX.Webhooks.Payload;
 public class ProjectTranslationFinishedEvent
 {
 
-    [Display("Project ID")]
-    public int ProjectId { get; set; }
+    //[Display("Project ID")]
+    //public int ProjectId { get; set; }
 
-    [Display("Project UUID")]
+    [Display("Project ID")]
     public string ProjectUuid { get; set; }
 
     [Display("Project name")]
