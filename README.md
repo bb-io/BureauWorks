@@ -35,7 +35,8 @@ Before you can connect you need to make sure that:
 5. Select webhook type the same you chose in step 1 in Blackbird (For example if you selected "On project status changed" in Blackbird - select "Project status changed" webhook type in Bureau Works).
 6. Click "Save webhook"
 
-![eventsetup](image/README/eventsetup.png)
+![eventsetup0](image/README/eventsetup0.png)
+![eventsetup1](image/README/eventsetup1.png)
 
 ## Actions
 
