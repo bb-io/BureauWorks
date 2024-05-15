@@ -94,13 +94,15 @@ public class TaskAssignedEvent
     [JsonProperty("reference_files")]
     public List<string> ReferenceFiles { get; set; }
 
-    //[Display("Scheduled date")]
-    //[JsonProperty("scheduled_date")]
-    //public long ScheduledDate { get; set; }
+    [Display("Scheduled date")]
+    [JsonProperty("scheduled_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime ScheduledDate { get; set; }
 
-    //[Display("Skip date")]
-    //[JsonProperty("skip_date")]
-    //public long SkipDate { get; set; }
+    [Display("Skip date")]
+    [JsonProperty("skip_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime SkipDate { get; set; }
 
     [JsonProperty("status")]
     public string Status { get; set; }
