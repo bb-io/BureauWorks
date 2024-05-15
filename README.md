@@ -26,6 +26,18 @@ Before you can connect you need to make sure that:
 
 ![connectionsetup](image/README/connectionsetup.png)
 
+## Setting up events
+
+1. Create a bird with event trigger from Bureau Works app and publish it
+2. Copy "Webhook URL" from event trigger of published bird
+3. Got to the [Webhooks page](https://app.bwx.io/settings/account-settings/webhooks) on Bureau Works.
+4. Paste "Webhook URL" to the url field and leave "Secret" field empty
+5. Select webhook type the same you chose in step 1 in Blackbird (For example if you selected "On project status changed" in Blackbird - select "Project status changed" webhook type in Bureau Works).
+6. Click "Save webhook"
+
+![eventsetup0](image/README/eventsetup0.png)
+![eventsetup1](image/README/eventsetup1.png)
+
 ## Actions
 
 ### Project
