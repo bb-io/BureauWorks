@@ -15,7 +15,7 @@ namespace Apps.BWX.Converters
             if (reader.TokenType == JsonToken.Integer)
             {
                 DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                return start.AddMilliseconds(long.Parse(reader.Value.ToString()));
+                return start.AddMilliseconds(long.Parse(reader.Value.ToString())).ToLocalTime();
             }
 
             throw new JsonException("The JSON value could not be converted to DateTime.");
