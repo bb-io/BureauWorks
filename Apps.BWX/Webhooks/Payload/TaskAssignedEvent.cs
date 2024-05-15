@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.BWX.Converters;
+using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
 namespace Apps.BWX.Webhooks.Payload;
@@ -9,13 +10,15 @@ public class TaskAssignedEvent
     [JsonProperty("uuid")]
     public string Uuid { get; set; }
 
-    //[Display("Acceptance date")]
-    //[JsonProperty("acceptance_date")]
-    //public long AcceptanceDate { get; set; }
+    [Display("Acceptance date")]
+    [JsonProperty("acceptance_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime AcceptanceDate { get; set; }
 
-    //[Display("Assign date")]
-    //[JsonProperty("assign_date")]
-    //public long AssignDate { get; set; }
+    [Display("Assign date")]
+    [JsonProperty("assign_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime AssignDate { get; set; }
 
     [Display("Assigned by email")]
     [JsonProperty("assigned_by_email")]
@@ -40,9 +43,10 @@ public class TaskAssignedEvent
     [JsonProperty("begin_index", NullValueHandling = NullValueHandling.Ignore)]
     public long BeginIndex { get; set; }
 
-    //[Display("Creation timestamp")]
-    //[JsonProperty("creation_timestamp")]
-    //public long CreationTimestamp { get; set; }
+    [Display("Creation date")]
+    [JsonProperty("creation_timestamp")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime CreationTimestamp { get; set; }
 
     [JsonProperty("creator")]
     public string Creator { get; set; }
@@ -51,13 +55,15 @@ public class TaskAssignedEvent
     [JsonProperty("creator_email")]
     public string CreatorEmail { get; set; }
 
-    //[Display("Delivery date")]
-    //[JsonProperty("delivery_date")]
-    //public long DeliveryDate { get; set; }
+    [Display("Delivery date")]
+    [JsonProperty("delivery_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime DeliveryDate { get; set; }
 
-    //[Display("Due date")]
-    //[JsonProperty("due_date")]
-    //public long DueDate { get; set; }
+    [Display("Due date")]
+    [JsonProperty("due_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime DueDate { get; set; }
 
     //[Display("End index")]
     //[JsonProperty("end_index")]
@@ -88,13 +94,15 @@ public class TaskAssignedEvent
     [JsonProperty("reference_files")]
     public List<string> ReferenceFiles { get; set; }
 
-    //[Display("Scheduled date")]
-    //[JsonProperty("scheduled_date")]
-    //public long ScheduledDate { get; set; }
+    [Display("Scheduled date")]
+    [JsonProperty("scheduled_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime ScheduledDate { get; set; }
 
-    //[Display("Skip date")]
-    //[JsonProperty("skip_date")]
-    //public long SkipDate { get; set; }
+    [Display("Skip date")]
+    [JsonProperty("skip_date")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime SkipDate { get; set; }
 
     [JsonProperty("status")]
     public string Status { get; set; }

@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.BWX.Converters;
+using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
 namespace Apps.BWX.Webhooks.Payload;
@@ -9,9 +10,10 @@ public class ProjectStatusChangedPayload
     [JsonProperty("uuid")]
     public string Uuid { get; set; }
 
-    //[Display("Creation timestamp")]
-    //[JsonProperty("creation_timestamp")]
-    //public long CreationTimestamp { get; set; }
+    [Display("Creation date")]
+    [JsonProperty("creation_timestamp")]
+    [JsonConverter(typeof(DateTimeConverter))]
+    public DateTime CreationTimestamp { get; set; }
     public string Creator { get; set; }
 
     [Display("Creator email")]
