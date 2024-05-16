@@ -28,7 +28,7 @@ namespace Apps.BWX.DataSourceHandlers
             if (string.IsNullOrEmpty(ProjectRequest?.ProjectId))
                 throw new ArgumentException("Please select project first!");
 
-            var request = new BWXRequest($"/api/v3/project/{ProjectRequest.ProjectId}/resource/simple", Method.Get, Creds);
+            var request = new RestRequest($"/api/v3/project/{ProjectRequest.ProjectId}/resource/simple", Method.Get);
             var projectResources = await Client.ExecuteWithErrorHandling<List<ProjectResourceDto>>(request);
 
             return projectResources.Where(el =>

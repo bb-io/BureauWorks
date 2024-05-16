@@ -22,12 +22,11 @@ public class UserDataHandler : BWXInvocable, IAsyncDataSourceHandler
 
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
     {
-        var request = new BWXRequest($"/api/v3/user?simple=true", Method.Get, Creds);
-        var projects = await Client.Paginate<UserDto>(request);
+        var request = new RestRequest($"/api/v3/user", Method.Get);
+        request.AddQueryParameter("simple", "true");
+        request.AddQueryParameter("name", context.SearchString);
+        var users = await Client.PaginateOnce<UserDto>(request);
 
-        return projects.Where(el =>
-                context.SearchString is null ||
-                el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(k => k.Uuid, v => v.Name);
+        return users.ToDictionary(k => k.Uuid, v => v.Name);
     }
 }

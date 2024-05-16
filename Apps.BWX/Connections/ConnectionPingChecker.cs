@@ -10,8 +10,8 @@ public class ConnectionPingChecker : IConnectionValidator
 {
     public ValueTask<ConnectionValidationResponse> ValidateConnection(IEnumerable<AuthenticationCredentialsProvider> authProviders, CancellationToken cancellationToken)
     {
-        var client = new BWXClient();
-        var request = new BWXRequest("/api/v3/language", Method.Get, authProviders);        
+        var client = new BWXClient(authProviders);
+        var request = new RestRequest("/api/v3/language", Method.Get);        
         try
         {
             var result = client.ExecuteWithErrorHandling(request).Result;

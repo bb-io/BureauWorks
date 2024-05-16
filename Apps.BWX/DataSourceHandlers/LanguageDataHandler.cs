@@ -15,7 +15,7 @@ public class LanguageDataHandler : BWXInvocable, IAsyncDataSourceHandler
 
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
     {
-        var request = new BWXRequest($"/api/v3/language", Method.Get, Creds);
+        var request = new RestRequest($"/api/v3/language", Method.Get);
         var languages = await Client.ExecuteWithErrorHandling<List<LanguageDto>>(request);
 
         return languages.Where(el =>

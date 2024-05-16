@@ -29,7 +29,7 @@ public class GlossaryActions : BWXInvocable
     public async Task<GlossaryDto> CreateGlossary(
         [ActionParameter] CreateGlossaryRequest input)
     {
-        var request = new BWXRequest($"/api/v3/glossary", Method.Post, Creds);
+        var request = new RestRequest($"/api/v3/glossary", Method.Post);
         request.AddJsonBody(new
         {
             name = input.Name,
@@ -49,10 +49,10 @@ public class GlossaryActions : BWXInvocable
     [Action("Export glossary", Description = "Export glossary")]
     public async Task<ExportGlossaryResponse> ExportGlossary([ActionParameter] ExportGlossaryRequest input)
     {
-        var initExportRequest = new BWXRequest($"/api/v3/glossary/export/{input.GlossaryId}/tbx", Method.Get, Creds);
+        var initExportRequest = new RestRequest($"/api/v3/glossary/export/{input.GlossaryId}/tbx", Method.Get);
         var initExportResult = await Client.ExecuteWithErrorHandling<ExportInitDto>(initExportRequest);
 
-        var exportStatusRequest = new BWXRequest($"/api/v3/glossary/export/{input.GlossaryId}/tbx/{initExportResult.RequestUuid}/status", Method.Get, Creds);
+        var exportStatusRequest = new RestRequest($"/api/v3/glossary/export/{input.GlossaryId}/tbx/{initExportResult.RequestUuid}/status", Method.Get);
         var exportStatusResult = await Client.ExecuteWithErrorHandling<ExportStatusDto>(exportStatusRequest);
         while(exportStatusResult.Status != "COMPLETED")
         {
@@ -76,7 +76,7 @@ public class GlossaryActions : BWXInvocable
         var fileStream = await _fileManagementClient.DownloadAsync(input.File);
         var fileTBXV2Stream = await fileStream.ConvertFromTbxV3ToV2();
 
-        var initImportRequest = new BWXRequest($"/api/v3/glossary/{input.GlossaryId}/import-tbx", Method.Post, Creds);
+        var initImportRequest = new RestRequest($"/api/v3/glossary/{input.GlossaryId}/import-tbx", Method.Post);
         initImportRequest.AddFile("tbxFile", await fileTBXV2Stream.GetByteData(), input.File.Name);
 
         await Client.ExecuteWithErrorHandling(initImportRequest);
@@ -84,7 +84,7 @@ public class GlossaryActions : BWXInvocable
 
     private async Task<GlossaryDto> GetGlossary([ActionParameter] ExportGlossaryRequest input)
     {
-        var request = new BWXRequest($"/api/v3/glossary/{input.GlossaryId}", Method.Get, Creds);
+        var request = new RestRequest($"/api/v3/glossary/{input.GlossaryId}", Method.Get);
         return await Client.ExecuteWithErrorHandling<GlossaryDto>(request);
     }
 }

@@ -22,12 +22,10 @@ public class OrganizationDataHandler : BWXInvocable, IAsyncDataSourceHandler
 
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
     {
-        var request = new BWXRequest($"/api/v2/organization", Method.Get, Creds);
-        var languages = await Client.Paginate<OrganizationDto>(request);
+        var request = new RestRequest($"/api/v2/organization", Method.Get);
+        request.AddQueryParameter("name", context.SearchString);
+        var organizations = await Client.PaginateOnce<OrganizationDto>(request);
 
-        return languages.Where(el =>
-                context.SearchString is null ||
-                el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(k => k.Uuid, v => v.Name);
+        return organizations.ToDictionary(k => k.Uuid, v => v.Name);
     }
 }

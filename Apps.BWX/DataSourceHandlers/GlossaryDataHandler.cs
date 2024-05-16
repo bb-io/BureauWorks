@@ -21,13 +21,11 @@ namespace Apps.BWX.DataSourceHandlers
 
         public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
         {
-            var request = new BWXRequest($"/api/v3/glossary?name={context.SearchString}", Method.Get, Creds);
-            var glossaries = await Client.Paginate<GlossaryDto>(request);
+            var request = new RestRequest($"/api/v3/glossary", Method.Get);
+            request.AddQueryParameter("name", context.SearchString);
+            var glossaries = await Client.PaginateOnce<GlossaryDto>(request);
 
-            return glossaries.Where(el =>
-                    context.SearchString is null ||
-                    el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-                .ToDictionary(k => k.Uuid, v => v.Name);
+            return glossaries.ToDictionary(k => k.Uuid, v => v.Name);
         }
     }
 }
