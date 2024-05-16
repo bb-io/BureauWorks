@@ -11,10 +11,10 @@ public class ConnectionPingChecker : IConnectionValidator
     public ValueTask<ConnectionValidationResponse> ValidateConnection(IEnumerable<AuthenticationCredentialsProvider> authProviders, CancellationToken cancellationToken)
     {
         var client = new BWXClient();
-        var request = new BWXRequest("/api/v3/project", Method.Get, authProviders);        
+        var request = new BWXRequest("/api/v3/language", Method.Get, authProviders);        
         try
         {
-            var result = client.Paginate<ProjectDto>(request).Result;
+            var result = client.ExecuteWithErrorHandling(request).Result;
             return new ValueTask<ConnectionValidationResponse>(new ConnectionValidationResponse()
             {
                 IsValid = true,
