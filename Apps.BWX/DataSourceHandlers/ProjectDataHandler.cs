@@ -1,6 +1,7 @@
 ﻿using Apps.BWX.Api;
 using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
+using Apps.BWX.Models.Project.Responses;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
@@ -15,12 +16,10 @@ public class ProjectDataHandler : BWXInvocable, IAsyncDataSourceHandler
 
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
     {
-        var request = new BWXRequest($"/api/v3/project", Method.Get, Creds);
-        var projects = await Client.Paginate<ProjectDto>(request);
+        var request = new RestRequest($"/api/v3/project", Method.Get);
+        request.AddQueryParameter("reference", context.SearchString);
+        var projects = await Client.PaginateOnce<ProjectDto>(request);
 
-        return projects.Where(el =>
-                context.SearchString is null ||
-                el.Reference.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(k => k.Uuid, v => $"{v.Reference} ({v.Name})");
+        return projects.ToDictionary(k => k.Uuid, v => $"{v.Reference} ({v.Name})");
     }
 }

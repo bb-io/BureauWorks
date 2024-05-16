@@ -22,12 +22,10 @@ public class ClientDataHandler : BWXInvocable, IAsyncDataSourceHandler
 
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
     {
-        var request = new BWXRequest($"/api/v3/client", Method.Get, Creds);
-        var languages = await Client.Paginate<ClientDto>(request);
+        var request = new RestRequest($"/api/v3/client", Method.Get);
+        request.AddQueryParameter("name", context.SearchString);
+        var clients = await Client.PaginateOnce<ClientDto>(request);
 
-        return languages.Where(el =>
-                context.SearchString is null ||
-                el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(k => k.Uuid, v => v.Name);
+        return clients.ToDictionary(k => k.Uuid, v => v.Name);
     }
 }

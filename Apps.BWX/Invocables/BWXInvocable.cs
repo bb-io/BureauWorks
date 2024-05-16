@@ -14,6 +14,6 @@ public class BWXInvocable : BaseInvocable
 
     public BWXInvocable(InvocationContext invocationContext) : base(invocationContext)
     {
-        Client = new();
+        Client = new(Creds);
     }
 }

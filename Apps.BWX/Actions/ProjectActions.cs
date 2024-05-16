@@ -33,7 +33,7 @@ public class ProjectActions : BWXInvocable
     [Action("Search projects", Description = "Search projects")]
     public async Task<List<ProjectDto>> SearchProjects([ActionParameter] SearchProjectRequest searchProjects)
     {      
-        var request = new BWXRequest($"/api/v3/project", Method.Get, Creds);
+        var request = new RestRequest($"/api/v3/project", Method.Get);
         request.AddQueryParameter("name", searchProjects?.ProjectName);
         request.AddQueryParameter("organizationUuid", searchProjects?.Organization);
         request.AddQueryParameter("orgUnitUuid", searchProjects?.Client);
@@ -59,14 +59,14 @@ public class ProjectActions : BWXInvocable
     [Action("Get project", Description = "Get project")]
     public async Task<ProjectDto> GetProject([ActionParameter] GetProjectRequest input)
     {
-        var request = new BWXRequest($"/api/v3/project/{input.ProjectId}", Method.Get, Creds);
+        var request = new RestRequest($"/api/v3/project/{input.ProjectId}", Method.Get);
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
     [Action("Create project", Description = "Create project")]
     public async Task<ProjectDto> CreateProject([ActionParameter] CreateProjectRequest input)
     {
-        var request = new BWXRequest($"/api/v3/project?inferDefaultSettings={input?.InferDefaultSettings?.ToString().ToLower() ?? "true"}", Method.Post, Creds);
+        var request = new RestRequest($"/api/v3/project?inferDefaultSettings={input?.InferDefaultSettings?.ToString().ToLower() ?? "true"}", Method.Post);
         request.AddJsonBody(new
         {
             reference = input.Reference,
@@ -84,7 +84,7 @@ public class ProjectActions : BWXInvocable
         [ActionParameter] GetProjectRequest getProjectRequest, 
         [ActionParameter] UploadFileRequest uploadFileRequest)
     {
-        var request = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource", Method.Post, Creds);
+        var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource", Method.Post);
         request.AddJsonBody(new
         {
             name = uploadFileRequest?.FileName ?? uploadFileRequest.File.Name,
@@ -93,13 +93,13 @@ public class ProjectActions : BWXInvocable
         });
         var projectFileInfoDto = await Client.ExecuteWithErrorHandling<ProjectFileInfoDto>(request);
 
-        var uploadRequest = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource/{projectFileInfoDto.Uuid}/content", Method.Put, Creds);
+        var uploadRequest = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource/{projectFileInfoDto.Uuid}/content", Method.Put);
         var fileBytes = await (await _fileManagementClient.DownloadAsync(uploadFileRequest.File)).GetByteData();
         uploadRequest.AlwaysMultipartFormData = true;
         uploadRequest.AddFile("file", fileBytes, uploadFileRequest.File.Name);
         await Client.ExecuteWithErrorHandling(uploadRequest);
 
-        var createWorkUnitRequest = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/work-unit?bulk=true", Method.Post, Creds);
+        var createWorkUnitRequest = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/work-unit?bulk=true", Method.Post);
         createWorkUnitRequest.AddJsonBody(JsonConvert.SerializeObject(
             new List<WorkUnitCreateDto>() { 
                 new WorkUnitCreateDto()
@@ -117,7 +117,7 @@ public class ProjectActions : BWXInvocable
         [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] ChangeProjectStatusRequest changeProjectStatusRequest)
     {
-        var request = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/status", Method.Post, Creds);
+        var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/status", Method.Post);
         request.AddJsonBody(new
         {
             newStatus = changeProjectStatusRequest.ProjectStatus,
@@ -131,7 +131,7 @@ public class ProjectActions : BWXInvocable
         [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
     {
-        var request = new BWXRequest($"/api/v3/project/{getProjectRequest.ProjectId}/download", Method.Get, Creds);
+        var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/download", Method.Get);
 
         if (downloadTranslatedFilesRequest.Resources != null && downloadTranslatedFilesRequest.Resources.Any())
             foreach (var resourceId in downloadTranslatedFilesRequest.Resources)
