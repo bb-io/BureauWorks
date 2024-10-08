@@ -1,5 +1,4 @@
-﻿using Apps.BWX.Api;
-using Apps.BWX.Dtos;
+﻿using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -14,12 +13,9 @@ using RestSharp;
 
 namespace Apps.BWX.DataSourceHandlers;
 
-public class ProjectManagerDataHandler : BWXInvocable, IAsyncDataSourceHandler
+public class ProjectManagerDataHandler(InvocationContext invocationContext)
+    : BWXInvocable(invocationContext), IAsyncDataSourceHandler
 {
-    public ProjectManagerDataHandler(InvocationContext invocationContext) : base(invocationContext)
-    {
-    }
-
     public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
     {
         var request = new RestRequest($"/api/v3/user", Method.Get);
