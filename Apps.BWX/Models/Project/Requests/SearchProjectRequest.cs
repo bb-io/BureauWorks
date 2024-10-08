@@ -15,8 +15,7 @@ public class SearchProjectRequest
     [DataSource(typeof(OrganizationDataHandler))]
     public string? Organization { get; set; }
 
-    [Display("Organization unit")]
-    [DataSource(typeof(ClientDataHandler))]
+    [Display("Organization unit"), DataSource(typeof(ClientDataHandler))]
     public string? Client { get; set; }
 
     [Display("Project manager")]
@@ -48,4 +47,7 @@ public class SearchProjectRequest
 
     [Display("Tags")]
     public List<string>? Tags { get; set; }
+
+    [Display("File name", Description = "Optional. It's the name of the file.")]
+    public string? FileName { get; set; }
 }

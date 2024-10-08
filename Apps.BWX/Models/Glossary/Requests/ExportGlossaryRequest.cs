@@ -11,8 +11,7 @@ namespace Apps.BWX.Models.Glossary.Requests
 {
     public class ExportGlossaryRequest
     {
-        [Display("Glossary ID")]
-        [DataSource(typeof(GlossaryDataHandler))]
+        [Display("Glossary ID"), DataSource(typeof(GlossaryDataHandler))]
         public string GlossaryId { get; set; }
     }
 }

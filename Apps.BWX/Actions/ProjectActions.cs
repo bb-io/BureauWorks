@@ -1,5 +1,4 @@
-﻿using Apps.BWX.Api;
-using Apps.BWX.Dtos;
+﻿using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -14,15 +13,9 @@ using Apps.BWX.Models.Project.Requests;
 namespace Apps.BWX.Actions;
 
 [ActionList]
-public class ProjectActions : BWXInvocable
+public class ProjectActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
+    : BWXInvocable(invocationContext)
 {
-    private readonly IFileManagementClient _fileManagementClient;
-
-    public ProjectActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : base(invocationContext)
-    {
-        _fileManagementClient = fileManagementClient;
-    }
-
     /** 
      * !!!Warning!!! 
      * Since BWX API is the same API their web platform uses 
@@ -33,7 +26,7 @@ public class ProjectActions : BWXInvocable
     [Action("Search projects", Description = "Search projects")]
     public async Task<List<ProjectDto>> SearchProjects([ActionParameter] SearchProjectRequest searchProjects)
     {      
-        var request = new RestRequest($"/api/v3/project", Method.Get);
+        var request = new RestRequest($"/api/v3/project");
         request.AddQueryParameter("name", searchProjects?.ProjectName);
         request.AddQueryParameter("organizationUuid", searchProjects?.Organization);
         request.AddQueryParameter("orgUnitUuid", searchProjects?.Client);
@@ -45,6 +38,8 @@ public class ProjectActions : BWXInvocable
         request.AddQueryParameter("endCreateDate", searchProjects.CreationDateEnd?.ToString("yyyy-MM-dd"));
         request.AddQueryParameter("startDueDate", searchProjects.DueDateStart?.ToString("yyyy-MM-dd"));
         request.AddQueryParameter("endDueDate", searchProjects.DueDateEnd?.ToString("yyyy-MM-dd"));
+        
+        request.AddQueryParameter("fileName", searchProjects?.FileName);
 
         if (searchProjects.ProjectStatuses != null && searchProjects.ProjectStatuses.Any())
             foreach(var status in searchProjects.ProjectStatuses)
@@ -94,7 +89,7 @@ public class ProjectActions : BWXInvocable
         var projectFileInfoDto = await Client.ExecuteWithErrorHandling<ProjectFileInfoDto>(request);
 
         var uploadRequest = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource/{projectFileInfoDto.Uuid}/content", Method.Put);
-        var fileBytes = await (await _fileManagementClient.DownloadAsync(uploadFileRequest.File)).GetByteData();
+        var fileBytes = await (await fileManagementClient.DownloadAsync(uploadFileRequest.File)).GetByteData();
         uploadRequest.AlwaysMultipartFormData = true;
         uploadRequest.AddFile("file", fileBytes, uploadFileRequest.File.Name);
         await Client.ExecuteWithErrorHandling(uploadRequest);
@@ -148,7 +143,7 @@ public class ProjectActions : BWXInvocable
         var translatedFiles = new DownloadTranslatedFilesResponse();
         foreach(var file in files)
         {
-           var uploadedFile = await _fileManagementClient.UploadAsync(file.FileStream, MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), file.UploadName);
+           var uploadedFile = await fileManagementClient.UploadAsync(file.FileStream, MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), file.UploadName);
            translatedFiles.TranslatedFiles.Add(uploadedFile);
         }
         return translatedFiles;

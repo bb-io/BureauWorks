@@ -1,4 +1,5 @@
-﻿using Blackbird.Applications.Sdk.Common.Authentication;
+﻿using Apps.BWX.Constants;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Connections;
 
 namespace Apps.BWX.Connections;
@@ -14,11 +15,11 @@ public class ConnectionDefinition : IConnectionDefinition
             ConnectionUsage = ConnectionUsage.Actions,
             ConnectionProperties = new List<ConnectionProperty>()
             {
-                new ConnectionProperty("accessKey")
+                new(CredNames.AccessKey)
                 {
                     DisplayName = "Access key",
                 },
-                new ConnectionProperty("secret")
+                new(CredNames.Secret)
                 {
                     DisplayName = "Secret",
                 }
@@ -31,12 +32,12 @@ public class ConnectionDefinition : IConnectionDefinition
     {
         yield return new AuthenticationCredentialsProvider(
             AuthenticationCredentialsRequestLocation.None,
-            "accessKey",
+            CredNames.AccessKey,
             values["accessKey"]
         );
         yield return new AuthenticationCredentialsProvider(
             AuthenticationCredentialsRequestLocation.None,
-            "secret",
+            CredNames.Secret,
             values["secret"]
         );
     }
