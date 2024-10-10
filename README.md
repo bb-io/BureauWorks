@@ -36,6 +36,7 @@ Before you can connect you need to make sure that:
 6. Click "Save webhook"
 
 ![eventsetup0](image/README/eventsetup0.png)
+
 ![eventsetup1](image/README/eventsetup1.png)
 
 ## Actions
