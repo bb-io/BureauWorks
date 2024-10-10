@@ -3,18 +3,15 @@ using System.Net;
 using Newtonsoft.Json;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Apps.BWX.Invocables;
+using Apps.BWX.Models.Project.Requests;
+using Apps.BWX.Models.Task.Requests;
+using Apps.BWX.Models.WorkUnit.Requests;
 using Apps.BWX.Webhooks.Payload;
 namespace Apps.BWX.Webhooks;
 
 [WebhookList]
-public class WebhookList : BWXInvocable
+public class WebhookList(InvocationContext invocationContext) : BWXInvocable(invocationContext)
 {
-
-    public WebhookList(InvocationContext invocationContext) : base(invocationContext)
-    {
-
-    }
-
     [Webhook("On empty project created", Description = "On empty project created")]
     public async Task<WebhookResponse<NewProjectEvent>> EmptyProjectCreated(WebhookRequest webhookRequest)
     {
@@ -46,12 +43,19 @@ public class WebhookList : BWXInvocable
     }
 
     [Webhook("On project status changed", Description = "On project status changed")]
-    public async Task<WebhookResponse<ProjectStatusChangedPayload>> ProjectStatusChanged(WebhookRequest webhookRequest)
+    public async Task<WebhookResponse<ProjectStatusChangedPayload>> ProjectStatusChanged(WebhookRequest webhookRequest,
+        [WebhookParameter] GetProjectOptionalRequest projectOptionalRequest)
     {
         var rawPayload = webhookRequest.Body.ToString();
         if (rawPayload == "{}")
             return GeneratePreflight<ProjectStatusChangedPayload>();
-        var payload = JsonConvert.DeserializeObject<ProjectStatusChangedPayload>(rawPayload);
+        var payload = JsonConvert.DeserializeObject<ProjectStatusChangedPayload>(rawPayload)!;
+        
+        if(projectOptionalRequest.ProjectId != null && projectOptionalRequest.ProjectId != payload.Uuid)
+        {            
+            return GeneratePreflight<ProjectStatusChangedPayload>();
+        }
+        
         return new WebhookResponse<ProjectStatusChangedPayload>
         {
             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
@@ -61,12 +65,19 @@ public class WebhookList : BWXInvocable
     }
 
     [Webhook("On project translation finished", Description = "On project translation finished")]
-    public async Task<WebhookResponse<ProjectTranslationFinishedEvent>> ProjectTranslationFinished(WebhookRequest webhookRequest)
+    public async Task<WebhookResponse<ProjectTranslationFinishedEvent>> ProjectTranslationFinished(WebhookRequest webhookRequest,
+        [WebhookParameter] GetProjectOptionalRequest projectOptionalRequest)
     {
         var rawPayload = webhookRequest.Body.ToString();
         if (rawPayload == "{}")
             return GeneratePreflight<ProjectTranslationFinishedEvent>();
-        var payload = JsonConvert.DeserializeObject<ProjectTranslationFinishedEvent>(rawPayload);
+        var payload = JsonConvert.DeserializeObject<ProjectTranslationFinishedEvent>(rawPayload!)!;
+        
+        if(projectOptionalRequest.ProjectId != null && projectOptionalRequest.ProjectId != payload.ProjectUuid)
+        {            
+            return GeneratePreflight<ProjectTranslationFinishedEvent>();
+        }
+        
         return new WebhookResponse<ProjectTranslationFinishedEvent>
         {
             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
@@ -76,12 +87,19 @@ public class WebhookList : BWXInvocable
     }
 
     [Webhook("On task assigned", Description = "On task assigned")]
-    public async Task<WebhookResponse<TaskAssignedEvent>> TaskAssigned(WebhookRequest webhookRequest)
+    public async Task<WebhookResponse<TaskAssignedEvent>> TaskAssigned(WebhookRequest webhookRequest,
+        [WebhookParameter] GetTaskOptionalRequest taskOptionalRequest)
     {
         var rawPayload = webhookRequest.Body.ToString();
         if (rawPayload == "{}")
             return GeneratePreflight<TaskAssignedEvent>();
-        var payload = JsonConvert.DeserializeObject<TaskAssignedEvent>(rawPayload);
+        var payload = JsonConvert.DeserializeObject<TaskAssignedEvent>(rawPayload)!;
+        
+        if(taskOptionalRequest.TaskId != null && taskOptionalRequest.TaskId != payload.Uuid)
+        {            
+            return GeneratePreflight<TaskAssignedEvent>();
+        }
+        
         return new WebhookResponse<TaskAssignedEvent>
         {
             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
@@ -91,12 +109,19 @@ public class WebhookList : BWXInvocable
     }
 
     [Webhook("On task status changed", Description = "On task status changed")]
-    public async Task<WebhookResponse<TaskStatusChangedPayload>> TaskStatusChanged(WebhookRequest webhookRequest)
+    public async Task<WebhookResponse<TaskStatusChangedPayload>> TaskStatusChanged(WebhookRequest webhookRequest, 
+        [WebhookParameter] GetTaskOptionalRequest taskOptionalRequest)
     {
         var rawPayload = webhookRequest.Body.ToString();
         if (rawPayload == "{}")
             return GeneratePreflight<TaskStatusChangedPayload>();
-        var payload = JsonConvert.DeserializeObject<TaskStatusChangedPayload>(rawPayload);
+        var payload = JsonConvert.DeserializeObject<TaskStatusChangedPayload>(rawPayload)!;
+        
+        if(taskOptionalRequest.TaskId != null && taskOptionalRequest.TaskId != payload.Uuid)
+        {            
+            return GeneratePreflight<TaskStatusChangedPayload>();
+        }
+        
         return new WebhookResponse<TaskStatusChangedPayload>
         {
             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
@@ -106,12 +131,19 @@ public class WebhookList : BWXInvocable
     }
 
     [Webhook("On work unit status changed", Description = "On work unit status changed")]
-    public async Task<WebhookResponse<WorkUnitStatusChangedEvent>> WorkUnitStatusChanged(WebhookRequest webhookRequest)
+    public async Task<WebhookResponse<WorkUnitStatusChangedEvent>> WorkUnitStatusChanged(WebhookRequest webhookRequest,
+        [WebhookParameter] GetWorkUnitOptionalRequest taskOptionalRequest)
     {
         var rawPayload = webhookRequest.Body.ToString();
         if (rawPayload == "{}")
             return GeneratePreflight<WorkUnitStatusChangedEvent>();
-        var payload = JsonConvert.DeserializeObject<WorkUnitStatusChangedEvent>(rawPayload);
+        var payload = JsonConvert.DeserializeObject<WorkUnitStatusChangedEvent>(rawPayload)!;
+        
+        if(taskOptionalRequest.WorkUnitId != null && taskOptionalRequest.WorkUnitId != payload.Id)
+        {            
+            return GeneratePreflight<WorkUnitStatusChangedEvent>();
+        }
+        
         return new WebhookResponse<WorkUnitStatusChangedEvent>
         {
             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK),
