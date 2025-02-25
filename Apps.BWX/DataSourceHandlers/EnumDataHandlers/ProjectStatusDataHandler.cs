@@ -1,16 +1,16 @@
 ﻿using Blackbird.Applications.Sdk.Common.Dictionaries;
+using Blackbird.Applications.Sdk.Common.Dynamic;
 
 namespace Apps.BWX.DataSourceHandlers.EnumDataHandlers;
 
-public class ProjectStatusDataHandler : IStaticDataSourceHandler
+public class ProjectStatusDataHandler : IStaticDataSourceItemHandler
 {
-    public Dictionary<string, string> GetData()
-     => new()
+    IEnumerable<DataSourceItem> IStaticDataSourceItemHandler.GetData() => new List<DataSourceItem>()
     {
-        {"Draft", "Draft"},
-        {"Pending", "Pending"},
-        {"Approved", "Approved"},
-        {"Delivered", "Delivered"},
-        {"Invoiced", "Invoiced"},
+        new DataSourceItem("Draft", "Draft"),
+        new DataSourceItem("Pending", "Pending"),
+        new DataSourceItem("Approved", "Approved"),
+        new DataSourceItem("Delivered", "Delivered"),
+        new DataSourceItem("Invoiced", "Invoiced")
     };
 }
