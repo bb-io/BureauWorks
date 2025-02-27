@@ -7,9 +7,9 @@ using RestSharp;
 namespace Apps.BWX.DataSourceHandlers;
 
 public class LanguageDataHandler(InvocationContext invocationContext)
-    : BWXInvocable(invocationContext), IAsyncDataSourceHandler
+    : BWXInvocable(invocationContext), IAsyncDataSourceItemHandler
 {
-    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
+    async Task<IEnumerable<DataSourceItem>> IAsyncDataSourceItemHandler.GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/api/v3/language", Method.Get);
         var languages = await Client.ExecuteWithErrorHandling<List<LanguageDto>>(request);
@@ -17,6 +17,6 @@ public class LanguageDataHandler(InvocationContext invocationContext)
         return languages.Where(el =>
                 context.SearchString is null ||
                 el.Name.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(k => k.Code, v => v.Name);
+            .Select(x=> new DataSourceItem(x.Code, x.Name));
     }
 }

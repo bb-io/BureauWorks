@@ -1,6 +1,7 @@
 ﻿using Apps.BWX.Constants;
 using Apps.BWX.Models.Project.Responses;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -41,7 +42,7 @@ public class BWXClient : RestClient
         var genericResponse = JsonConvert.DeserializeObject<GenericResponse>(response.Content!);
 
         if (!string.IsNullOrEmpty(genericResponse?.Code))
-            throw new Exception($"Error ({genericResponse.Code}): {genericResponse.Message}");
+            throw new PluginApplicationException(genericResponse.Message);
 
         return response;
     }

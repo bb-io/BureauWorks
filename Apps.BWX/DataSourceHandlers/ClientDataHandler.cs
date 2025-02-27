@@ -7,14 +7,14 @@ using RestSharp;
 namespace Apps.BWX.DataSourceHandlers;
 
 public class ClientDataHandler(InvocationContext invocationContext)
-    : BWXInvocable(invocationContext), IAsyncDataSourceHandler
+    : BWXInvocable(invocationContext), IAsyncDataSourceItemHandler
 {
-    public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
+    async Task<IEnumerable<DataSourceItem>> IAsyncDataSourceItemHandler.GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
     {
         var request = new RestRequest($"/api/v3/client");
         request.AddQueryParameter("name", context.SearchString);
         var clients = await Client.PaginateOnce<ClientDto>(request);
 
-        return clients.ToDictionary(k => k.Uuid, v => v.Name);
+        return clients.Select(x => new DataSourceItem(x.Uuid, x.Name));
     }
 }

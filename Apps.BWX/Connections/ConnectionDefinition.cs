@@ -12,7 +12,6 @@ public class ConnectionDefinition : IConnectionDefinition
         {
             Name = "ApiToken",
             AuthenticationType = ConnectionAuthenticationType.Undefined,
-            ConnectionUsage = ConnectionUsage.Actions,
             ConnectionProperties = new List<ConnectionProperty>()
             {
                 new(CredNames.AccessKey)
@@ -31,12 +30,10 @@ public class ConnectionDefinition : IConnectionDefinition
         Dictionary<string, string> values)
     {
         yield return new AuthenticationCredentialsProvider(
-            AuthenticationCredentialsRequestLocation.None,
             CredNames.AccessKey,
             values["accessKey"]
         );
         yield return new AuthenticationCredentialsProvider(
-            AuthenticationCredentialsRequestLocation.None,
             CredNames.Secret,
             values["secret"]
         );

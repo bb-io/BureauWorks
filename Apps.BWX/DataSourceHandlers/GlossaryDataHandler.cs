@@ -7,15 +7,15 @@ using RestSharp;
 namespace Apps.BWX.DataSourceHandlers
 {
     public class GlossaryDataHandler(InvocationContext invocationContext)
-        : BWXInvocable(invocationContext), IAsyncDataSourceHandler
+        : BWXInvocable(invocationContext), IAsyncDataSourceItemHandler
     {
-        public async Task<Dictionary<string, string>> GetDataAsync(DataSourceContext context, CancellationToken token)
+        async Task<IEnumerable<DataSourceItem>> IAsyncDataSourceItemHandler.GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)
         {
             var request = new RestRequest($"/api/v3/glossary", Method.Get);
             request.AddQueryParameter("name", context.SearchString);
             var glossaries = await Client.PaginateOnce<GlossaryDto>(request);
 
-            return glossaries.ToDictionary(k => k.Uuid, v => v.Name);
+            return glossaries.Select(x => new DataSourceItem(x.Uuid, x.Name));
         }
     }
 }
