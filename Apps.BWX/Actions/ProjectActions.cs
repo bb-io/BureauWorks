@@ -127,14 +127,21 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
     {
         var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/download", Method.Get);
-
         if (downloadTranslatedFilesRequest.Resources != null && downloadTranslatedFilesRequest.Resources.Any())
+        {
             foreach (var resourceId in downloadTranslatedFilesRequest.Resources)
+            {
                 request.AddQueryParameter("resources", resourceId);
+            }
+        }
 
         if (downloadTranslatedFilesRequest.Locales != null && downloadTranslatedFilesRequest.Locales.Any())
+        {
             foreach (var locale in downloadTranslatedFilesRequest.Locales)
+            {
                 request.AddQueryParameter("locales", locale);
+            }
+        }
 
         var result = await Client.ExecuteWithErrorHandling(request);
         using var resultStream = new MemoryStream(result.RawBytes);

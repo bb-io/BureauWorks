@@ -1,4 +1,5 @@
 ﻿using Apps.BWX.Constants;
+using Apps.BWX.Dtos;
 using Apps.BWX.Models.Project.Responses;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Exceptions;
@@ -29,26 +30,18 @@ public class BWXClient : RestClient
             });
 
         var result = restClient.Execute(restRequest);
-        if(result.IsSuccessful == false)
+        if (result.IsSuccessful == false)
         {
             throw new PluginApplicationException($"Error while getting token: {result.Content}");
         }
-        
+
         AuthToken = result.Headers?.FirstOrDefault(x => x.Name == "X-AUTH-TOKEN")?.Value?.ToString() ?? string.Empty;
     }
 
     public async Task<RestResponse> ExecuteWithErrorHandling(RestRequest request)
     {
         var response = await ExecuteAsync(request);
-
-        if (!CheckIfJsonObject(response.Content!))
-            return response;
-
-        var genericResponse = JsonConvert.DeserializeObject<GenericResponse>(response.Content!);
-
-        if (!string.IsNullOrEmpty(genericResponse?.Code))
-            throw new PluginApplicationException(genericResponse.Message);
-
+        CheckResponseForErrors(response.Content!);
         return response;
     }
 
@@ -57,6 +50,33 @@ public class BWXClient : RestClient
         request.AddHeader("X-AUTH-TOKEN", AuthToken);
         var response = await ExecuteWithErrorHandling(request);
         return JsonConvert.DeserializeObject<T>(response.Content!, JsonConfig.Settings)!;
+    }
+
+    private void CheckResponseForErrors(string content)
+    {
+        ErrorResponseDto? errorDto = null;
+        try
+        {
+            errorDto = JsonConvert.DeserializeObject<ErrorResponseDto>(content);
+        }
+        catch (Exception)
+        { }
+
+        if (errorDto != null && errorDto.Status == 0 && !string.IsNullOrEmpty(errorDto.Exception))
+        {
+            throw new PluginMisconfigurationException(errorDto.Message);
+        }
+
+        if (!CheckIfJsonObject(content))
+        {
+            return;
+        }
+
+        var genericResponse = JsonConvert.DeserializeObject<GenericResponse>(content);
+        if (!string.IsNullOrEmpty(genericResponse?.Code))
+        {
+            throw new PluginApplicationException(genericResponse.Message);
+        }
     }
 
     public async Task<IEnumerable<T>> PaginateOnce<T>(RestRequest request)
@@ -75,7 +95,7 @@ public class BWXClient : RestClient
         request.AddQueryParameter("size", 50);
         int page = 0;
         bool last;
-        
+
         do
         {
             request.AddQueryParameter("page", page);
