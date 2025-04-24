@@ -23,7 +23,7 @@ public class BWXClient : RestClient
 
         var restClient = new RestClient(Urls.Api);
         var restRequest = new RestRequest(Urls.TokenUrl, Method.Post)
-            .AddBody(new
+            .AddJsonBody(new
             {
                 accessKey = token,
                 secret
