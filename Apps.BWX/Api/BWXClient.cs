@@ -2,40 +2,45 @@
 using Apps.BWX.Models.Project.Responses;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Exceptions;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using System.Net.Sockets;
 
 namespace Apps.BWX.Api;
 
 public class BWXClient : RestClient
 {
     protected string AuthToken { get; set; }
+
     public BWXClient(IEnumerable<AuthenticationCredentialsProvider> creds) : base(new RestClientOptions()
     {
         BaseUrl = new(Urls.Api)
     })
     {
-        var token = creds.First(x => x.KeyName == "accessKey").Value;
-        var secret = creds.First(x => x.KeyName == "secret").Value;
+        var token = creds.First(x => x.KeyName == CredNames.AccessKey).Value;
+        var secret = creds.First(x => x.KeyName == CredNames.Secret).Value;
 
         var restClient = new RestClient(Urls.Api);
-        var restRequest = new RestRequest(Urls.TokenUrl, Method.Post);
-        restRequest.AddBody(new
-        {
-            accessKey = token,
-            secret = secret
-        });
+        var restRequest = new RestRequest(Urls.TokenUrl, Method.Post)
+            .AddBody(new
+            {
+                accessKey = token,
+                secret
+            });
+
         var result = restClient.Execute(restRequest);
-        AuthToken = result.Headers.FirstOrDefault(x => x.Name == "X-AUTH-TOKEN").Value.ToString();
+        if(result.IsSuccessful == false)
+        {
+            throw new PluginApplicationException($"Error while getting token: {result.Content}");
+        }
+        
+        AuthToken = result.Headers?.FirstOrDefault(x => x.Name == "X-AUTH-TOKEN")?.Value?.ToString() ?? string.Empty;
     }
 
     public async Task<RestResponse> ExecuteWithErrorHandling(RestRequest request)
     {
         var response = await ExecuteAsync(request);
-        
+
         if (!CheckIfJsonObject(response.Content!))
             return response;
 
@@ -69,15 +74,16 @@ public class BWXClient : RestClient
         request.AddQueryParameter("sort", "sortingByCreateDate");
         request.AddQueryParameter("size", 50);
         int page = 0;
-        bool last = false;
+        bool last;
+        
         do
-        {            
+        {
             request.AddQueryParameter("page", page);
             var response = await ExecuteWithErrorHandling<PaginationResponse<T>>(request);
             result.AddRange(response.Content);
             last = response.Last;
             ++page;
-            
+
         } while (!last);
 
         return result;

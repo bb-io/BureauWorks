@@ -8,26 +8,26 @@ namespace Apps.BWX.Connections;
 
 public class ConnectionPingChecker : IConnectionValidator
 {
-    public ValueTask<ConnectionValidationResponse> ValidateConnection(IEnumerable<AuthenticationCredentialsProvider> authProviders, CancellationToken cancellationToken)
+    public async ValueTask<ConnectionValidationResponse> ValidateConnection(IEnumerable<AuthenticationCredentialsProvider> authProviders, CancellationToken cancellationToken)
     {
-        var client = new BWXClient(authProviders);
-        var request = new RestRequest("/api/v3/language", Method.Get);        
         try
         {
-            var result = client.ExecuteWithErrorHandling(request).Result;
-            return new ValueTask<ConnectionValidationResponse>(new ConnectionValidationResponse()
+            var client = new BWXClient(authProviders);
+            var request = new RestRequest("/api/v3/language", Method.Get); 
+            var result = await client.ExecuteWithErrorHandling(request);
+            return new ConnectionValidationResponse()
             {
                 IsValid = true,
                 Message = "Success"
-            });
+            };
         }
         catch (Exception ex)
         {
-            return new ValueTask<ConnectionValidationResponse>(new ConnectionValidationResponse()
+            return new ConnectionValidationResponse()
             {
                 IsValid = false,
                 Message = ex.Message
-            });
+            };
         }
     }
 }
