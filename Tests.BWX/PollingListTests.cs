@@ -39,7 +39,7 @@ public class PollingListTests : TestBase
         
         // Log for debugging
         Console.WriteLine($"Response: {JsonConvert.SerializeObject(response, Formatting.Indented)}");
-        Console.WriteLine($"Found projects: {response.Result.Count}");
+        Console.WriteLine($"Found projects: {response.Result.Projects.Count}");
         Console.WriteLine($"Stored IDs in memory: {string.Join(", ", response.Memory.ProjectIds)}");
         
         // The first run should not trigger the event since we're just building initial memory
@@ -79,9 +79,9 @@ public class PollingListTests : TestBase
         Console.WriteLine($"Updated memory IDs: {string.Join(", ", response.Memory.ProjectIds)}");
         
         // Verify new projects were found if any exist
-        Console.WriteLine($"New projects found: {response.Result.Count}");
+        Console.WriteLine($"New projects found: {response.Result.Projects.Count}");
         
-        if (response.Result.Count > 0)
+        if (response.Result.Projects.Count > 0)
         {
             // We should have more IDs in memory than we started with
             Assert.IsTrue(response.Memory.ProjectIds.Count > expectedPartialIdsCount, 
@@ -123,10 +123,10 @@ public class PollingListTests : TestBase
         
         // Log for debugging
         Console.WriteLine($"Response: {JsonConvert.SerializeObject(response, Formatting.Indented)}");
-        Console.WriteLine($"Projects found: {response.Result.Count}");
+        Console.WriteLine($"Projects found: {response.Result.Projects.Count}");
         
         // No new projects should be found since we're using the complete memory
-        Assert.AreEqual(0, response.Result.Count, "No new projects should be found");
+        Assert.AreEqual(0, response.Result.Projects.Count, "No new projects should be found");
         Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
     }
 }

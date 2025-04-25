@@ -11,7 +11,7 @@ namespace Apps.BWX.Webhooks;
 public class PollingList(InvocationContext invocationContext) : BWXInvocable(invocationContext)
 {
     [PollingEvent("On projects created", Description = "Polling event that periodically checks for new projects. If a new projects are found, it will return the new projects.")]
-    public async Task<PollingEventResponse<ProjectsMemory, List<ProjectDto>>> OnProjectsCreated(PollingEventRequest<ProjectsMemory> pollingRequest)
+    public async Task<PollingEventResponse<ProjectsMemory, ProjectsResponse>> OnProjectsCreated(PollingEventRequest<ProjectsMemory> pollingRequest)
     {
         var isFirstRun = pollingRequest.Memory == null;
         var memory = InitializeMemory(pollingRequest.Memory);
@@ -68,14 +68,14 @@ public class PollingList(InvocationContext invocationContext) : BWXInvocable(inv
         memory.LastPollingTime = DateTime.UtcNow;
     }
     
-    private PollingEventResponse<ProjectsMemory, List<ProjectDto>> CreatePollingResponse(
+    private PollingEventResponse<ProjectsMemory, ProjectsResponse> CreatePollingResponse(
         List<ProjectDto> newProjects, 
         ProjectsMemory memory, 
         bool isFirstRun)
     {
-        return new PollingEventResponse<ProjectsMemory, List<ProjectDto>>
+        return new PollingEventResponse<ProjectsMemory, ProjectsResponse>
         {
-            Result = newProjects,
+            Result = new(newProjects),
             Memory = memory,
             FlyBird = isFirstRun ? false : newProjects.Any()
         };
