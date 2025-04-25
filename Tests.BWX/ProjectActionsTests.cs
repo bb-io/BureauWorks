@@ -13,7 +13,7 @@ public class ProjectActionsTests : TestBase
     {
         // Arrange
         var projectActions = new ProjectActions(InvocationContext, FileManager);
-        var projectId = "19b1bc57-b470-4557-99d7-eb64f709b4cd";
+        var projectId = "8958a12d-f5f1-4cf6-ae98-77dfdd07cbc4";
         
         var getProjectRequest = new GetProjectRequest
         {

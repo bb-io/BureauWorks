@@ -129,7 +129,9 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         string requestUuid = await InitiateTranslationDownload(getProjectRequest.ProjectId, downloadTranslatedFilesRequest);
         string downloadUrl = await WaitForTranslationPreparation(getProjectRequest.ProjectId, requestUuid);
         byte[] fileContent = await DownloadTranslationArchive(downloadUrl);
-        return await ProcessTranslationFiles(fileContent);
+
+        var project = await GetProject(getProjectRequest);
+        return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
     }
     
     private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
@@ -184,7 +186,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return downloadResponse.RawBytes!;
     }
     
-    private async Task<DownloadTranslatedFilesResponse> ProcessTranslationFiles(byte[] archiveContent)
+    private async Task<DownloadTranslatedFilesResponse> ProcessTranslationFiles(byte[] archiveContent, string sourceLanguage, List<string> targetLanguages)
     {
         using var resultStream = new MemoryStream(archiveContent);
         var files = await resultStream.GetFilesFromZip();
@@ -196,8 +198,15 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
                 file.FileStream, 
                 MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), 
                 file.UploadName);
-                
-            translatedFiles.TranslatedFiles.Add(uploadedFile);
+            
+            var fileWithLanguages = new FileWithLanguagesResponse
+            {
+                SourceLanguage = sourceLanguage,
+                TargetLanguage = targetLanguages.FirstOrDefault(x => uploadedFile.Name.StartsWith(x)) ?? string.Empty,
+                File = uploadedFile
+            };
+
+            translatedFiles.TranslatedFiles.Add(fileWithLanguages);
         }
         
         return translatedFiles;
