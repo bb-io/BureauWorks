@@ -9,7 +9,7 @@ using RestSharp;
 namespace Apps.BWX.Webhooks;
 
 [PollingEventList]
-public class TaskPollingList(InvocationContext invocationContext) : BWXInvocable(invocationContext)
+public class TasksPollingList(InvocationContext invocationContext) : BWXInvocable(invocationContext)
 {
     [PollingEvent("On task status changed", Description = "Polling event that periodically checks for new tasks. If a new tasks are found, it will return the new tasks.")]
     public async Task<PollingEventResponse<TaskStatusMemory, TaskDto>> OnTaskStatusChanged(PollingEventRequest<TaskStatusMemory> pollingRequest,
