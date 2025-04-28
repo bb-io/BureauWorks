@@ -18,12 +18,17 @@ public class ProjectsPollingList(InvocationContext invocationContext) : BWXInvoc
         var memory = InitializeMemory(pollingRequest.Memory);
         
         var request = CreateProjectsRequest(memory);
-        var projects = await FetchProjects(request);
+        var projects = await Client.Paginate<ProjectDto>(request);
         
         var newProjects = FilterNewProjects(projects, memory.ProjectIds);
         UpdateMemory(memory, newProjects);
         
-        return CreatePollingResponse(newProjects, memory, isFirstRun);
+        return new PollingEventResponse<ProjectsMemory, ProjectsResponse>
+        {
+            Result = new(newProjects),
+            Memory = memory,
+            FlyBird = isFirstRun ? false : newProjects.Any()
+        };
     }
     
     [PollingEvent("On project status changed", Description = "Polling event that periodically checks for new projects. If a new projects are found, it will return the new projects.")]
@@ -90,11 +95,6 @@ public class ProjectsPollingList(InvocationContext invocationContext) : BWXInvoc
         return request;
     }
     
-    private async Task<List<ProjectDto>> FetchProjects(RestRequest request)
-    {
-        return await Client.Paginate<ProjectDto>(request);
-    }
-    
     private List<ProjectDto> FilterNewProjects(List<ProjectDto> allProjects, List<string> existingProjectIds)
     {
         return allProjects
@@ -110,18 +110,5 @@ public class ProjectsPollingList(InvocationContext invocationContext) : BWXInvoc
         }
         
         memory.LastPollingTime = DateTime.UtcNow;
-    }
-    
-    private PollingEventResponse<ProjectsMemory, ProjectsResponse> CreatePollingResponse(
-        List<ProjectDto> newProjects, 
-        ProjectsMemory memory, 
-        bool isFirstRun)
-    {
-        return new PollingEventResponse<ProjectsMemory, ProjectsResponse>
-        {
-            Result = new(newProjects),
-            Memory = memory,
-            FlyBird = isFirstRun ? false : newProjects.Any()
-        };
     }
 }
