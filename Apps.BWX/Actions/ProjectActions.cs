@@ -23,7 +23,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
      * some parts of code are based on the endpoints which are used by BWX web platform. (It could be both v3 or v2 endpoints)
      * Next method is based on web platform calls
      * **/
-    [Action("Search projects", Description = "Search projects")]
+    [Action("Search projects", Description = "Search projects based on provided filters")]
     public async Task<List<ProjectDto>> SearchProjects([ActionParameter] SearchProjectRequest searchProjects)
     {      
         var request = new RestRequest($"/api/v3/project");
@@ -51,14 +51,14 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.Paginate<ProjectDto>(request);
     }
 
-    [Action("Get project", Description = "Get project")]
+    [Action("Get project", Description = "Get project by ID")]
     public async Task<ProjectDto> GetProject([ActionParameter] GetProjectRequest input)
     {
         var request = new RestRequest($"/api/v3/project/{input.ProjectId}", Method.Get);
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
-    [Action("Create project", Description = "Create project")]
+    [Action("Create project", Description = "Create project with provided parameters")]
     public async Task<ProjectDto> CreateProject([ActionParameter] CreateProjectRequest input)
     {
         var request = new RestRequest($"/api/v3/project?inferDefaultSettings={input?.InferDefaultSettings?.ToString().ToLower() ?? "true"}", Method.Post);
@@ -107,7 +107,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return (await Client.ExecuteWithErrorHandling<List<WorkUnitDto>>(createWorkUnitRequest)).First();
     }
 
-    [Action("Change project status", Description = "Change project status")]
+    [Action("Change project status", Description = "Change project status to provided status")]
     public async Task<ProjectDto> ChangeProjectStatus(
         [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] ChangeProjectStatusRequest changeProjectStatusRequest)
@@ -121,7 +121,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
-    [Action("Download translated files", Description = "Download translated files")]
+    [Action("Download translated files", Description = "Download translated files for project")]
     public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
         [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
