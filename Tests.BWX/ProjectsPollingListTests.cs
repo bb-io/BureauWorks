@@ -8,15 +8,15 @@ using Tests.BWX.Base;
 namespace Tests.BWX;
 
 [TestClass]
-public class PollingListTests : TestBase
+public class ProjectsPollingListTests : TestBase
 {
-    private PollingList _pollingList;
+    private ProjectsPollingList _projectsPollingList;
     private readonly List<string> _expectedProjectIds = ["8958a12d-f5f1-4cf6-ae98-77dfdd07cbc4", "d77691b4-2c67-4fa7-9426-8794a91c7880", "42188c5f-f250-4352-ac45-080ff3441814"]; // Replace with actual project IDs from your system
 
     [TestInitialize]
     public void Initialize()
     {
-        _pollingList = new PollingList(InvocationContext);
+        _projectsPollingList = new ProjectsPollingList(InvocationContext);
     }
 
     [TestMethod]
@@ -30,7 +30,7 @@ public class PollingListTests : TestBase
         };
 
         // Act
-        var response = await _pollingList.OnProjectsCreated(request);
+        var response = await _projectsPollingList.OnProjectsCreated(request);
 
         // Assert
         Assert.IsNotNull(response);
@@ -66,7 +66,7 @@ public class PollingListTests : TestBase
         };
 
         // Act
-        var response = await _pollingList.OnProjectsCreated(request);
+        var response = await _projectsPollingList.OnProjectsCreated(request);
 
         // Assert
         Assert.IsNotNull(response);
@@ -104,7 +104,7 @@ public class PollingListTests : TestBase
             PollingTime = DateTime.UtcNow
         };
         
-        var initialResponse = await _pollingList.OnProjectsCreated(initialRequest);
+        var initialResponse = await _projectsPollingList.OnProjectsCreated(initialRequest);
         
         // Now use that complete memory for a second request
         var request = new PollingEventRequest<ProjectsMemory>
@@ -114,7 +114,7 @@ public class PollingListTests : TestBase
         };
 
         // Act
-        var response = await _pollingList.OnProjectsCreated(request);
+        var response = await _projectsPollingList.OnProjectsCreated(request);
 
         // Assert
         Assert.IsNotNull(response);
