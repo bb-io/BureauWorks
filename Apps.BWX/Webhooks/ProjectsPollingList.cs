@@ -37,7 +37,7 @@ public class ProjectsPollingList(InvocationContext invocationContext) : BWXInvoc
             WasTriggered = false
         };
         
-        if (project.Status == projectWithStatusRequest.Status && memory.WasTriggered == false)
+        if (project.Status.Equals(projectWithStatusRequest.Status, StringComparison.OrdinalIgnoreCase) && memory.WasTriggered == false)
         {
             return new PollingEventResponse<ProjectStatusMemory, ProjectDto>
             {
