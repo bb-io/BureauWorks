@@ -1,4 +1,5 @@
 ﻿using Blackbird.Applications.Sdk.Common;
+using Newtonsoft.Json;
 
 namespace Apps.BWX.Dtos;
 
@@ -14,10 +15,10 @@ public class ProjectDto
     
     public string Currency { get; set; } = default!;
 
-    [Display("Source locale")]
+    [Display("Source locale"), JsonProperty("sourceLocale")]
     public string SourceLocale { get; set; }
 
-    [Display("Target locales")]
+    [Display("Target locales"), JsonProperty("targetLocales")]
     public List<string> TargetLocales { get; set; } = default!;
 
     [Display("Is continuous?")]

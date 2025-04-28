@@ -6,9 +6,9 @@ namespace Apps.BWX.Connections;
 
 public class ConnectionDefinition : IConnectionDefinition
 {
-    public IEnumerable<ConnectionPropertyGroup> ConnectionPropertyGroups => new List<ConnectionPropertyGroup>()
-    {
-        new ConnectionPropertyGroup
+    public IEnumerable<ConnectionPropertyGroup> ConnectionPropertyGroups =>
+    [
+        new() 
         {
             Name = "ApiToken",
             AuthenticationType = ConnectionAuthenticationType.Undefined,
@@ -21,21 +21,16 @@ public class ConnectionDefinition : IConnectionDefinition
                 new(CredNames.Secret)
                 {
                     DisplayName = "Secret",
+                    Sensitive = true,
                 }
             }
         }
-    };
+    ];
 
     public IEnumerable<AuthenticationCredentialsProvider> CreateAuthorizationCredentialsProviders(
         Dictionary<string, string> values)
     {
-        yield return new AuthenticationCredentialsProvider(
-            CredNames.AccessKey,
-            values["accessKey"]
-        );
-        yield return new AuthenticationCredentialsProvider(
-            CredNames.Secret,
-            values["secret"]
-        );
+        yield return new AuthenticationCredentialsProvider(CredNames.AccessKey, values["accessKey"]);
+        yield return new AuthenticationCredentialsProvider(CredNames.Secret, values["secret"]);
     }
 }

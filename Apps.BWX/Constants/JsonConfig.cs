@@ -9,7 +9,7 @@ public static class JsonConfig
     {
         ContractResolver = new DefaultContractResolver()
         {
-            NamingStrategy = new SnakeCaseNamingStrategy()
+            NamingStrategy = new CamelCaseNamingStrategy()
         },
         NullValueHandling = NullValueHandling.Ignore
     };
