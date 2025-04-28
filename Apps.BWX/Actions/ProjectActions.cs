@@ -23,7 +23,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
      * some parts of code are based on the endpoints which are used by BWX web platform. (It could be both v3 or v2 endpoints)
      * Next method is based on web platform calls
      * **/
-    [Action("Search projects", Description = "Search projects")]
+    [Action("Search projects", Description = "Search projects based on provided filters")]
     public async Task<List<ProjectDto>> SearchProjects([ActionParameter] SearchProjectRequest searchProjects)
     {      
         var request = new RestRequest($"/api/v3/project");
@@ -51,14 +51,14 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.Paginate<ProjectDto>(request);
     }
 
-    [Action("Get project", Description = "Get project")]
+    [Action("Get project", Description = "Get project by ID")]
     public async Task<ProjectDto> GetProject([ActionParameter] GetProjectRequest input)
     {
         var request = new RestRequest($"/api/v3/project/{input.ProjectId}", Method.Get);
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
-    [Action("Create project", Description = "Create project")]
+    [Action("Create project", Description = "Create project with provided parameters")]
     public async Task<ProjectDto> CreateProject([ActionParameter] CreateProjectRequest input)
     {
         var request = new RestRequest($"/api/v3/project?inferDefaultSettings={input?.InferDefaultSettings?.ToString().ToLower() ?? "true"}", Method.Post);
@@ -107,7 +107,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return (await Client.ExecuteWithErrorHandling<List<WorkUnitDto>>(createWorkUnitRequest)).First();
     }
 
-    [Action("Change project status", Description = "Change project status")]
+    [Action("Change project status", Description = "Change project status to provided status")]
     public async Task<ProjectDto> ChangeProjectStatus(
         [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] ChangeProjectStatusRequest changeProjectStatusRequest)
@@ -121,31 +121,113 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
-    [Action("Download translated files", Description = "Download translated files")]
+    [Action("Download translated files", Description = "Download translated files for project")]
     public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
         [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
     {
-        var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/download", Method.Get);
+        string requestUuid = await InitiateTranslationDownload(getProjectRequest.ProjectId, downloadTranslatedFilesRequest);
+        string downloadUrl = await WaitForTranslationPreparation(getProjectRequest.ProjectId, requestUuid);
+        byte[] fileContent = await DownloadTranslationArchive(downloadUrl);
 
-        if (downloadTranslatedFilesRequest.Resources != null && downloadTranslatedFilesRequest.Resources.Any())
-            foreach (var resourceId in downloadTranslatedFilesRequest.Resources)
-                request.AddQueryParameter("resources", resourceId);
-
-        if (downloadTranslatedFilesRequest.Locales != null && downloadTranslatedFilesRequest.Locales.Any())
-            foreach (var locale in downloadTranslatedFilesRequest.Locales)
-                request.AddQueryParameter("locales", locale);
-
-        var result = await Client.ExecuteWithErrorHandling(request);
-        using var resultStream = new MemoryStream(result.RawBytes);
-        var files = await resultStream.GetFilesFromZip();
-
-        var translatedFiles = new DownloadTranslatedFilesResponse();
-        foreach(var file in files)
+        var project = await GetProject(getProjectRequest);
+        return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
+    }
+    
+    private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
+    {
+        var initiateRequest = new RestRequest($"/api/v3/project/{projectId}/download", Method.Post);
+        AddResourcesAndLocalesParameters(initiateRequest, downloadRequest);
+        
+        var initiateResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationInitiateResponse>(initiateRequest);
+        return initiateResponse.RequestUuid;
+    }
+    
+    private async Task<string> WaitForTranslationPreparation(string projectId, string requestUuid)
+    {
+        var statusRequest = new RestRequest(
+            $"/api/v3/project/{projectId}/download/{requestUuid}/status", Method.Get);
+        
+        const int maxAttempts = 30;
+        const int pollingIntervalMs = 1000;
+        int attempts = 0;
+        
+        while (attempts < maxAttempts)
         {
-           var uploadedFile = await fileManagementClient.UploadAsync(file.FileStream, MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), file.UploadName);
-           translatedFiles.TranslatedFiles.Add(uploadedFile);
+            if (attempts > 0)
+            {
+                await Task.Delay(pollingIntervalMs);
+            }
+                
+            var statusResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationStatusResponse>(statusRequest);
+            
+            if (statusResponse.Status == "COMPLETED")
+            {
+                return statusResponse.DownloadUrl;
+            }
+            
+            attempts++;
         }
+        
+        throw new TimeoutException("Timeout waiting for translation files to be prepared");
+    }
+    
+    private async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
+    {
+        var client = new RestClient();
+        var downloadRequest = new RestRequest(downloadUrl, Method.Get);
+        var downloadResponse = await client.ExecuteAsync(downloadRequest);
+        
+        if (!downloadResponse.IsSuccessful)
+        {
+            throw new Exception($"Failed to download translation files: {downloadResponse.ErrorMessage}");
+        }
+            
+        return downloadResponse.RawBytes!;
+    }
+    
+    private async Task<DownloadTranslatedFilesResponse> ProcessTranslationFiles(byte[] archiveContent, string sourceLanguage, List<string> targetLanguages)
+    {
+        using var resultStream = new MemoryStream(archiveContent);
+        var files = await resultStream.GetFilesFromZip();
+        
+        var translatedFiles = new DownloadTranslatedFilesResponse();
+        foreach (var file in files)
+        {
+            var uploadedFile = await fileManagementClient.UploadAsync(
+                file.FileStream, 
+                MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), 
+                file.UploadName);
+            
+            var fileWithLanguages = new FileWithLanguagesResponse
+            {
+                SourceLanguage = sourceLanguage,
+                TargetLanguage = targetLanguages.FirstOrDefault(x => uploadedFile.Name.StartsWith(x)) ?? string.Empty,
+                File = uploadedFile
+            };
+
+            translatedFiles.TranslatedFiles.Add(fileWithLanguages);
+        }
+        
         return translatedFiles;
+    }
+    
+    private void AddResourcesAndLocalesParameters(RestRequest request, DownloadTranslatedFilesRequest downloadRequest)
+    {
+        if (downloadRequest.Resources != null && downloadRequest.Resources.Any())
+        {
+            foreach (var resourceId in downloadRequest.Resources)
+            {
+                request.AddQueryParameter("resources", resourceId);
+            }
+        }
+
+        if (downloadRequest.Locales != null && downloadRequest.Locales.Any())
+        {
+            foreach (var locale in downloadRequest.Locales)
+            {
+                request.AddQueryParameter("locales", locale);
+            }
+        }
     }
 }

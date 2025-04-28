@@ -5,12 +5,18 @@ namespace Apps.BWX.Models.Project.Responses;
 
 public class DownloadTranslatedFilesResponse
 {
-    public DownloadTranslatedFilesResponse()
-    {
-        TranslatedFiles = new List<FileReference>();
-    }
-
-
     [Display("Translated files")]
-    public List<FileReference> TranslatedFiles { get; set; }
+    public List<FileWithLanguagesResponse> TranslatedFiles { get; set; } = new();
+}
+
+public class FileWithLanguagesResponse
+{
+    [Display("Source language")]
+    public string SourceLanguage { get; set; } = string.Empty;
+
+    [Display("Target language")]
+    public string TargetLanguage { get; set; } = string.Empty;
+
+    [Display("File")]
+    public FileReference File { get; set; } = new();
 }
