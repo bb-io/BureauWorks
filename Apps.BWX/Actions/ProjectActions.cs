@@ -25,7 +25,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
      * **/
     [Action("Search projects", Description = "Search projects based on provided filters")]
     public async Task<List<ProjectDto>> SearchProjects([ActionParameter] SearchProjectRequest searchProjects)
-    {      
+    {
         var request = new RestRequest($"/api/v3/project");
         request.AddQueryParameter("name", searchProjects?.ProjectName);
         request.AddQueryParameter("organizationUuid", searchProjects?.Organization);
@@ -38,11 +38,11 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         request.AddQueryParameter("endCreateDate", searchProjects.CreationDateEnd?.ToString("yyyy-MM-dd"));
         request.AddQueryParameter("startDueDate", searchProjects.DueDateStart?.ToString("yyyy-MM-dd"));
         request.AddQueryParameter("endDueDate", searchProjects.DueDateEnd?.ToString("yyyy-MM-dd"));
-        
+
         request.AddQueryParameter("fileName", searchProjects?.FileName);
 
         if (searchProjects.ProjectStatuses != null && searchProjects.ProjectStatuses.Any())
-            foreach(var status in searchProjects.ProjectStatuses)
+            foreach (var status in searchProjects.ProjectStatuses)
                 request.AddQueryParameter("status", status);
         if (searchProjects.Tags != null && searchProjects.Tags.Any())
             foreach (var tag in searchProjects.Tags)
@@ -76,16 +76,17 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
 
     [Action("Upload file to project", Description = "Upload file to project")]
     public async Task<WorkUnitDto> UploadFileToProject(
-        [ActionParameter] GetProjectRequest getProjectRequest, 
+        [ActionParameter] GetProjectRequest getProjectRequest,
         [ActionParameter] UploadFileRequest uploadFileRequest)
     {
-        var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource", Method.Post);
-        request.AddJsonBody(new
-        {
-            name = uploadFileRequest?.FileName ?? uploadFileRequest.File.Name,
-            path = uploadFileRequest?.FilePath ?? uploadFileRequest.File.Name,
-            notes = uploadFileRequest?.Notes ?? string.Empty
-        });
+        var request = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource", Method.Post)
+            .AddJsonBody(new
+            {
+                name = uploadFileRequest?.FileName ?? uploadFileRequest.File.Name,
+                path = uploadFileRequest?.FilePath ?? uploadFileRequest.File.Name,
+                notes = uploadFileRequest?.Notes ?? string.Empty
+            });
+        
         var projectFileInfoDto = await Client.ExecuteWithErrorHandling<ProjectFileInfoDto>(request);
 
         var uploadRequest = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/resource/{projectFileInfoDto.Uuid}/content", Method.Put);
@@ -96,13 +97,13 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
 
         var createWorkUnitRequest = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/work-unit?bulk=true", Method.Post);
         createWorkUnitRequest.AddJsonBody(JsonConvert.SerializeObject(
-            new List<WorkUnitCreateDto>() { 
+            new List<WorkUnitCreateDto>() {
                 new WorkUnitCreateDto()
                 {
                     ProjectResourceUuid = projectFileInfoDto.Uuid,
                     Workflows = uploadFileRequest.Workflows,
                     TargetLocales = uploadFileRequest.TargetLocales,
-                } 
+                }
             }));
         return (await Client.ExecuteWithErrorHandling<List<WorkUnitDto>>(createWorkUnitRequest)).First();
     }
@@ -133,72 +134,72 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         var project = await GetProject(getProjectRequest);
         return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
     }
-    
+
     private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
     {
         var initiateRequest = new RestRequest($"/api/v3/project/{projectId}/download", Method.Post);
         AddResourcesAndLocalesParameters(initiateRequest, downloadRequest);
-        
+
         var initiateResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationInitiateResponse>(initiateRequest);
         return initiateResponse.RequestUuid;
     }
-    
+
     private async Task<string> WaitForTranslationPreparation(string projectId, string requestUuid)
     {
         var statusRequest = new RestRequest(
             $"/api/v3/project/{projectId}/download/{requestUuid}/status", Method.Get);
-        
+
         const int maxAttempts = 30;
         const int pollingIntervalMs = 1000;
         int attempts = 0;
-        
+
         while (attempts < maxAttempts)
         {
             if (attempts > 0)
             {
                 await Task.Delay(pollingIntervalMs);
             }
-                
+
             var statusResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationStatusResponse>(statusRequest);
-            
+
             if (statusResponse.Status == "COMPLETED")
             {
                 return statusResponse.DownloadUrl;
             }
-            
+
             attempts++;
         }
-        
+
         throw new TimeoutException("Timeout waiting for translation files to be prepared");
     }
-    
+
     private async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
     {
         var client = new RestClient();
         var downloadRequest = new RestRequest(downloadUrl, Method.Get);
         var downloadResponse = await client.ExecuteAsync(downloadRequest);
-        
+
         if (!downloadResponse.IsSuccessful)
         {
             throw new Exception($"Failed to download translation files: {downloadResponse.ErrorMessage}");
         }
-            
+
         return downloadResponse.RawBytes!;
     }
-    
+
     private async Task<DownloadTranslatedFilesResponse> ProcessTranslationFiles(byte[] archiveContent, string sourceLanguage, List<string> targetLanguages)
     {
         using var resultStream = new MemoryStream(archiveContent);
         var files = await resultStream.GetFilesFromZip();
-        
+
         var translatedFiles = new DownloadTranslatedFilesResponse();
         foreach (var file in files)
         {
             var uploadedFile = await fileManagementClient.UploadAsync(
-                file.FileStream, 
-                MimeMapping.MimeUtility.GetMimeMapping(file.UploadName), 
+                file.FileStream,
+                MimeMapping.MimeUtility.GetMimeMapping(file.UploadName),
                 file.UploadName);
-            
+
             var fileWithLanguages = new FileWithLanguagesResponse
             {
                 SourceLanguage = sourceLanguage,
@@ -208,10 +209,10 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
 
             translatedFiles.TranslatedFiles.Add(fileWithLanguages);
         }
-        
+
         return translatedFiles;
     }
-    
+
     private void AddResourcesAndLocalesParameters(RestRequest request, DownloadTranslatedFilesRequest downloadRequest)
     {
         if (downloadRequest.Resources != null && downloadRequest.Resources.Any())

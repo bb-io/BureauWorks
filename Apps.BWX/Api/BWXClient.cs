@@ -40,6 +40,7 @@ public class BWXClient : RestClient
 
     public async Task<RestResponse> ExecuteWithErrorHandling(RestRequest request)
     {
+        request.AddHeader("X-AUTH-TOKEN", AuthToken);
         var response = await ExecuteAsync(request);
         CheckResponseForErrors(response.Content!);
         return response;
