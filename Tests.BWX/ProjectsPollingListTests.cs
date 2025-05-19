@@ -1,4 +1,5 @@
 using Apps.BWX.Dtos;
+using Apps.BWX.Models.Project.Requests;
 using Apps.BWX.Webhooks;
 using Apps.BWX.Webhooks.Models;
 using Blackbird.Applications.Sdk.Common.Polling;
@@ -128,5 +129,27 @@ public class ProjectsPollingListTests : TestBase
         // No new projects should be found since we're using the complete memory
         Assert.AreEqual(0, response.Result.Projects.Count, "No new projects should be found");
         Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
+    }
+
+    
+
+    //OnProjectStatusChanged
+    [TestMethod]
+    public async Task OnProjectStatusChanged_ShouldBeSuccess()
+    {
+        // Arrange
+        var request = new PollingEventRequest<ProjectStatusMemory>
+        {
+            Memory = null,
+            PollingTime = DateTime.UtcNow.AddDays(-1) 
+        };
+        var projectStatus = new ProjectWithStatusRequest {ProjectId= "609f4071-d046-4704-9463-225ac850356d", Statuses = ["Invoiced", "Delivered"] };
+
+        // Act
+        var response = await _projectsPollingList.OnProjectStatusChanged(request, projectStatus);
+        Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
+        Console.WriteLine($"{response.Result.Status} - {response.Result.Uuid}");
+
+        Assert.IsNotNull(response);
     }
 }

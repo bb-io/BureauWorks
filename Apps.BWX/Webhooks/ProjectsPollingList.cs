@@ -5,6 +5,7 @@ using Apps.BWX.Webhooks.Models;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
 using RestSharp;
+using System;
 
 namespace Apps.BWX.Webhooks;
 
@@ -41,27 +42,32 @@ public class ProjectsPollingList(InvocationContext invocationContext) : BWXInvoc
             PreviousStatus = string.Empty,
             WasTriggered = false
         };
-        
-        if (project.Status.Equals(projectWithStatusRequest.Status, StringComparison.OrdinalIgnoreCase) && memory.WasTriggered == false)
+
+        var currentStatus = project.Status;
+
+        var match = projectWithStatusRequest.Statuses
+            .Any(s => string.Equals(s, currentStatus, StringComparison.OrdinalIgnoreCase));
+
+        if (match && !memory.WasTriggered)
         {
             return new PollingEventResponse<ProjectStatusMemory, ProjectDto>
             {
                 Result = project,
-                Memory = new()
+                Memory = new ProjectStatusMemory
                 {
-                    PreviousStatus = project.Status,
+                    PreviousStatus = currentStatus,
                     WasTriggered = true
                 },
                 FlyBird = true
             };
         }
-        
+
         return new PollingEventResponse<ProjectStatusMemory, ProjectDto>
         {
             Result = project,
-            Memory = new()
+            Memory = new ProjectStatusMemory
             {
-                PreviousStatus = project.Status,
+                PreviousStatus = currentStatus,
                 WasTriggered = memory.WasTriggered
             },
             FlyBird = false
