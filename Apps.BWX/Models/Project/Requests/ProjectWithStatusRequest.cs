@@ -7,5 +7,5 @@ namespace Apps.BWX.Models.Project.Requests;
 public class ProjectWithStatusRequest : GetProjectRequest
 {
     [Display("Status"), StaticDataSource(typeof(ProjectStatusDataHandler))]
-    public string Status { get; set; } = string.Empty;
+    public IEnumerable<string> Statuses { get; set; } = new List<string>();
 }
