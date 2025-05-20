@@ -15,12 +15,12 @@ public class ProjectActionsTests : TestBase
         // Arrange
         var projectActions = new ProjectActions(InvocationContext, FileManager);
         var projectId = "8958a12d-f5f1-4cf6-ae98-77dfdd07cbc4";
-        
+
         var getProjectRequest = new GetProjectRequest
         {
             ProjectId = projectId
         };
-        
+
         var downloadRequest = new DownloadTranslatedFilesRequest();
 
         // Act
@@ -29,7 +29,7 @@ public class ProjectActionsTests : TestBase
         // Assert
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.TranslatedFiles);
-        
+
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
     }
 
@@ -38,16 +38,16 @@ public class ProjectActionsTests : TestBase
     {
         // Arrange
         var projectActions = new ProjectActions(InvocationContext, FileManager);
-        
+
         var getProjectRequest = new GetProjectRequest
         {
             ProjectId = "8958a12d-f5f1-4cf6-ae98-77dfdd07cbc4"
         };
-        
+
         var uploadFileRequest = new UploadFileRequest
         {
-            File = new FileReference 
-            { 
+            File = new FileReference
+            {
                 Name = "3 random sentences.txt",
                 ContentType = "text/plain"
             },
@@ -61,5 +61,18 @@ public class ProjectActionsTests : TestBase
         // Assert
         Assert.IsNotNull(result);
         Console.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented));
+    }
+
+    [TestMethod]
+    public async Task GetProject_IsSuccess()
+    {
+        var action = new ProjectActions(InvocationContext, FileManager);
+
+        var response = await action.GetProject(new GetProjectRequest
+        {
+            ProjectId = "357d7463-57e9-4de2-9102-34a5cba0cfe5"
+        });
+
+        Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
     }
 }

@@ -131,7 +131,7 @@ public class Cost
     public int MatchStart { get; set; }
 
     [Display("Match end")]
-    public int MatchEnd { get; set; }
+    public int? MatchEnd { get; set; }
 
     [Display("Display order")]
     public string DisplayOrder { get; set; } = default!;
@@ -139,7 +139,7 @@ public class Cost
     [Display("Unit type")]
     public string UnitType { get; set; } = default!;
     
-    public int Units { get; set; }
+    public double Units { get; set; }
 
     [Display("Cost per unit")]
     public double CostPerUnit { get; set; }
