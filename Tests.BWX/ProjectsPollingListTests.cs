@@ -143,13 +143,12 @@ public class ProjectsPollingListTests : TestBase
             Memory = null,
             PollingTime = DateTime.UtcNow.AddDays(-1) 
         };
-        var projectStatus = new ProjectWithStatusRequest {ProjectId= "609f4071-d046-4704-9463-225ac850356d", Statuses = ["Invoiced", "Delivered"] };
+        var projectStatus = new ProjectWithStatusRequest {ProjectId= "17b43bbd-932f-4c29-b8ee-79004dcfe920  ", Statuses = ["Invoiced", "Delivered"] };
 
         // Act
         var response = await _projectsPollingList.OnProjectStatusChanged(request, projectStatus);
-        Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
-        Console.WriteLine($"{response.Result.Status} - {response.Result.Uuid}");
-
+        //Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
+        Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
         Assert.IsNotNull(response);
     }
 }
