@@ -9,6 +9,7 @@ using RestSharp;
 using Newtonsoft.Json;
 using Apps.BWX.Models.Project.Responses;
 using Apps.BWX.Models.Project.Requests;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.BWX.Actions;
 
@@ -150,7 +151,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
             $"/api/v3/project/{projectId}/download/{requestUuid}/status", Method.Get);
 
         const int maxAttempts = 30;
-        const int pollingIntervalMs = 1000;
+        const int pollingIntervalMs = 20000;
         int attempts = 0;
 
         while (attempts < maxAttempts)
@@ -170,7 +171,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
             attempts++;
         }
 
-        throw new TimeoutException("Timeout waiting for translation files to be prepared");
+        throw new PluginApplicationException("Timeout waiting for translation files to be prepared");
     }
 
     private async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
