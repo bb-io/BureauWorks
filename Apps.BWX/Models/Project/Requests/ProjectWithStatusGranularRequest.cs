@@ -18,5 +18,5 @@ public class ProjectWithStatusGranularRequest
     public string? Reference { get; set; }
 
     [Display("Tags")]
-    public IEnumerable<string> Tags { get; set; } = new List<string>();
+    public IEnumerable<string>? Tags { get; set; } = new List<string>();
 }
