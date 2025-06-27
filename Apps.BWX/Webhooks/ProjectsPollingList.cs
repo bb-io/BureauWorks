@@ -33,7 +33,7 @@ public class ProjectsPollingList(InvocationContext invocationContext) : BWXInvoc
         };
     }
     
-    [PollingEvent("On project status changed (Deprecated)", Description = "Polling event that periodically checks for project status changes. If a project status changes, it will return the project with the new status.")]
+    [PollingEvent("On project status changed", Description = "Polling event that periodically checks for project status changes. If a project status changes, it will return the project with the new status.")]
     public async Task<PollingEventResponse<ProjectStatusMemory, ProjectDto>> OnProjectStatusChanged(PollingEventRequest<ProjectStatusMemory> pollingRequest,
         [PollingEventParameter] ProjectWithStatusRequest projectWithStatusRequest)
     {
