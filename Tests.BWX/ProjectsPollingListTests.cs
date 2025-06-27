@@ -133,7 +133,7 @@ public class ProjectsPollingListTests : TestBase
 
 
 
-    //OnProjectStatusChanged (deprecated polling event, use OnGranularProjectStatusChanged)
+    //OnProjectStatusChanged
     [TestMethod]
     public async Task OnProjectStatusChanged_ShouldBeSuccess()
     {
