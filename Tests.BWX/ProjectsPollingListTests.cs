@@ -131,9 +131,9 @@ public class ProjectsPollingListTests : TestBase
         Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
     }
 
-    
 
-    //OnProjectStatusChanged
+
+    //OnProjectStatusChanged (deprecated polling event, use OnGranularProjectStatusChanged)
     [TestMethod]
     public async Task OnProjectStatusChanged_ShouldBeSuccess()
     {
@@ -143,12 +143,62 @@ public class ProjectsPollingListTests : TestBase
             Memory = null,
             PollingTime = DateTime.UtcNow.AddDays(-1) 
         };
-        var projectStatus = new ProjectWithStatusRequest {ProjectId= "17b43bbd-932f-4c29-b8ee-79004dcfe920  ", Statuses = ["Invoiced", "Delivered"] };
+        var projectStatus = new ProjectWithStatusRequest {ProjectId= "17b43bbd-932f-4c29-b8ee-79004dcfe920", Statuses = ["Invoiced", "Delivered"] };
 
         // Act
         var response = await _projectsPollingList.OnProjectStatusChanged(request, projectStatus);
         //Assert.IsFalse(response.FlyBird, "FlyBird should be false when no new projects are found");
         Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
         Assert.IsNotNull(response);
+    }
+
+    [DataTestMethod]
+    [DataRow("PREVIOUS", "e46e7df2-a19c-4852-9014-10959007c05d", null, null, false, DisplayName = "Previous status and project ID provided")]
+    [DataRow("undesired status", "e46e7df2-a19c-4852-9014-10959007c05d", null, null, false, DisplayName = "Wrong new status and project ID provided")]
+    [DataRow("APPROVED", "e46e7df2-a19c-4852-9014-10959007c05d", "Sample reference", "blackbird", true, DisplayName = "All optional inputs provided")]
+    [DataRow("APPROVED", null, null, null, true, DisplayName = "No optional inputs provided")]
+    [DataRow("APPROVED", "e46e7df2-a19c-4852-9014-10959007c05d", null, null, true, DisplayName = "Project ID provided")]
+    [DataRow("APPROVED", null, null, "Else;blackbird;", true, DisplayName = "Multiple tags provided")]
+    [DataRow("APPROVED", null, "Sample reference", null, true, DisplayName = "Reference provided")]
+    public async Task OnGranularProjectStatusChanged_ShouldBeSuccess(
+        string status,
+        string projectId,
+        string reference,
+        string tagsCsv,
+        bool shouldFly)
+    {
+        // Arrange
+        var memory = new ProjectStatusMemoryGranular
+        {
+            LastPollingTime = new DateTime(2025, 5, 10, 0, 0, 0, DateTimeKind.Utc),
+            ProjectsPreviousStatus = new Dictionary<string, string>
+            {
+                { "e46e7df2-a19c-4852-9014-10959007c05d", "PREVIOUS" } // Simulate a previous status
+            }
+        };
+
+        var request = new PollingEventRequest<ProjectStatusMemoryGranular>
+        {
+            Memory = memory,
+            PollingTime = DateTime.UtcNow.AddDays(-1)
+        };
+
+        var statusRequest = new ProjectWithStatusGranularRequest
+        {
+            Statuses = new List<string> { status },
+            ProjectId = projectId,
+            Reference = reference,
+            Tags = string.IsNullOrEmpty(tagsCsv) ? new List<string>() : tagsCsv.Split(';').ToList()
+        };
+
+        // Act
+        var response = await _projectsPollingList.OnGranularProjectStatusChanged(request, statusRequest);
+
+        // Log for debugging
+        // Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
+
+        // Assert
+        Assert.IsNotNull(response);
+        Assert.AreEqual(shouldFly, response.FlyBird, "response.FlyBird response is not expected.");
     }
 }
