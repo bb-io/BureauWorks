@@ -13,7 +13,7 @@ using System.Net.Mime;
 
 namespace Apps.BWX.Actions;
 
-[ActionList]
+[ActionList("Glossaries")]
 public class GlossaryActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : BWXInvocable(invocationContext)
 {

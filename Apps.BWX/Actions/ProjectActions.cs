@@ -13,7 +13,7 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.BWX.Actions;
 
-[ActionList]
+[ActionList("Projects")]
 public class ProjectActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient)
     : BWXInvocable(invocationContext)
 {
