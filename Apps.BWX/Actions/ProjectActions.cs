@@ -1,15 +1,16 @@
 ﻿using Apps.BWX.Dtos;
 using Apps.BWX.Invocables;
+using Apps.BWX.Models.Project.Requests;
+using Apps.BWX.Models.Project.Responses;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using Blackbird.Applications.Sdk.Common.Invocation;
-using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
-using Blackbird.Applications.Sdk.Utils.Extensions.Files;
-using RestSharp;
-using Newtonsoft.Json;
-using Apps.BWX.Models.Project.Responses;
-using Apps.BWX.Models.Project.Requests;
 using Blackbird.Applications.Sdk.Common.Exceptions;
+using Blackbird.Applications.Sdk.Common.Invocation;
+using Blackbird.Applications.Sdk.Utils.Extensions.Files;
+using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using DocumentFormat.OpenXml.Office2016.Excel;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace Apps.BWX.Actions;
 
@@ -123,24 +124,98 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
+    //Temporarily commenting out the async method because it throws BadRequest System error. Sync method works fine (see below)
+
+    //[Action("Download translated files", Description = "Download translated files for project")]
+    //public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
+    //    [ActionParameter] GetProjectRequest getProjectRequest,
+    //    [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
+    //{
+    //    string requestUuid = await InitiateTranslationDownload(getProjectRequest.ProjectId, downloadTranslatedFilesRequest);
+    //    string downloadUrl = await WaitForTranslationPreparation(getProjectRequest.ProjectId, requestUuid);
+    //    byte[] fileContent = await DownloadTranslationArchive(downloadUrl);
+
+    //    var project = await GetProject(getProjectRequest);
+    //    return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
+    //}
+
     [Action("Download translated files", Description = "Download translated files for project")]
     public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
-        [ActionParameter] GetProjectRequest getProjectRequest,
-        [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
+       [ActionParameter] GetProjectRequest getProjectRequest,
+       [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
     {
-        string requestUuid = await InitiateTranslationDownload(getProjectRequest.ProjectId, downloadTranslatedFilesRequest);
-        string downloadUrl = await WaitForTranslationPreparation(getProjectRequest.ProjectId, requestUuid);
-        byte[] fileContent = await DownloadTranslationArchive(downloadUrl);
+        var initiateRequest = new RestRequest($"/api/v3/project/{getProjectRequest.ProjectId}/download", Method.Get);
+        AddResourcesAndLocalesParameters(initiateRequest, downloadTranslatedFilesRequest);
+        var Response = await Client.ExecuteWithErrorHandling(initiateRequest);
+
+        byte[] fileContent = Response.RawBytes;
 
         var project = await GetProject(getProjectRequest);
         return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
+        
     }
+
+    [Action("Export project as Loc kit", Description = "Exports project files as a zip files containing XLIFF or XLSX")]
+    public async Task<FileResponse> ExportProjectLocKit(
+    [ActionParameter] GetProjectRequest projectRequest,
+    [ActionParameter] ExportLocKitRequest exportRequest)
+    {
+        var startRequest = new RestRequest(
+            $"/api/v3/project/{projectRequest.ProjectId}/translation-kit-job/loc-kit",
+            Method.Post);
+
+        startRequest.AddJsonBody(new
+        {
+            locKitTypeJob = exportRequest.LocKitTypeJob,
+            workUnitUuids = exportRequest.WorkUnitUuids,
+            projectId = projectRequest.ProjectId,
+            workflowLevel = exportRequest.WorkflowLevel
+        });
+
+        var exportResponse =
+            await Client.ExecuteWithErrorHandling<LocKitExportResponse>(startRequest);
+
+        var requestId = exportResponse.Id;
+
+        LocKitDownloadStatusResponse statusResponse;
+        while (true)
+        {
+            var pollRequest = new RestRequest(
+                $"/api/v3/project/{projectRequest.ProjectId}/translation-kit-job/{requestId}",
+                Method.Get);
+
+            statusResponse =
+                await Client.ExecuteWithErrorHandling<LocKitDownloadStatusResponse>(pollRequest);
+
+            if (statusResponse.Status == "COMPLETED")
+                break;
+
+            if (statusResponse.Status == "FAILED")
+                throw new Exception("LOC kit export failed.");
+
+            await Task.Delay(TimeSpan.FromSeconds(2)); 
+        }
+
+        var fileBytes = await DownloadTranslationArchive(statusResponse.DownloadFileUrl);
+
+        using var stream = new MemoryStream(fileBytes); 
+
+        var uploadedFile = await fileManagementClient.UploadAsync(
+            stream,
+            MimeMapping.KnownMimeTypes.Zip,
+            $"loc_kit_{projectRequest.ProjectId}.zip");
+
+        return new FileResponse
+        { 
+            File = uploadedFile
+        };
+    }
+      
 
     private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
     {
         var initiateRequest = new RestRequest($"/api/v3/project/{projectId}/download", Method.Post);
         AddResourcesAndLocalesParameters(initiateRequest, downloadRequest);
-
         var initiateResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationInitiateResponse>(initiateRequest);
         return initiateResponse.RequestUuid;
     }
@@ -204,7 +279,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
             var fileWithLanguages = new FileWithLanguagesResponse
             {
                 SourceLanguage = sourceLanguage,
-                TargetLanguage = targetLanguages.FirstOrDefault(x => uploadedFile.Name.StartsWith(x)) ?? string.Empty,
+                TargetLanguage = targetLanguages.FirstOrDefault(x => file.UploadName.StartsWith(x)) ?? string.Empty,
                 File = uploadedFile
             };
 
