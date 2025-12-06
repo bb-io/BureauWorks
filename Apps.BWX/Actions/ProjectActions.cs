@@ -155,7 +155,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         
     }
 
-    [Action("Export project as LOC kit", Description = "Exports a project as a LOC kit and downloads the resulting archive")]
+    [Action("Export project as Loc kit", Description = "Exports project files as a zip files containing XLIFF or XLSX")]
     public async Task<FileResponse> ExportProjectLocKit(
     [ActionParameter] GetProjectRequest projectRequest,
     [ActionParameter] ExportLocKitRequest exportRequest)

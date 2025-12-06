@@ -1,10 +1,13 @@
-﻿using Blackbird.Applications.Sdk.Common;
+﻿using Apps.BWX.DataSourceHandlers.EnumDataHandlers;
+using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.BWX.Models.Project.Requests;
 
 public class ExportLocKitRequest
 {
-    [Display("LOC kit type (XLIFF or XLSX)")]
+    [Display("LOC kit type")]
+    [StaticDataSource(typeof(LocKitTypeHandler))]
     public string LocKitTypeJob { get; set; }
 
     [Display("Work unit UUIDs")]
