@@ -124,7 +124,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
-    //Temporarily commenting out the async method because it throws BasRequest System error. Sync method works fine (see below)
+    //Temporarily commenting out the async method because it throws BadRequest System error. Sync method works fine (see below)
 
     //[Action("Download translated files", Description = "Download translated files for project")]
     //public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
