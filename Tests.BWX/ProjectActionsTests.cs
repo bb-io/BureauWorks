@@ -70,9 +70,27 @@ public class ProjectActionsTests : TestBase
 
         var response = await action.GetProject(new GetProjectRequest
         {
-            ProjectId = "357d7463-57e9-4de2-9102-34a5cba0cfe5"
+            ProjectId = "ff84a3ed-1b52-4f2d-9269-9185e2f6aec7"
         });
 
         Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
+    }
+
+    [TestMethod]
+    public async Task UploadProjectResource_IsSuccess()
+    {
+        // Arrange
+        var action = new ProjectActions(InvocationContext, FileManager);
+        var project = new GetProjectRequest { ProjectId = "ff84a3ed-1b52-4f2d-9269-9185e2f6aec7" };
+        var input = new UploadProjectResourceRequest
+        {
+            ConfirmAllImportedSegments = false,
+            ConfirmOnlyChangedSegments = true,
+            WorkUnitUuid = "aa59e845-8eb6-4a4c-a171-3caad18f7779",
+            File = new FileReference { Name = "3 random sentences_.txt" }
+        };
+
+        // Act
+        await action.UploadProjectResource(project, input);
     }
 }
