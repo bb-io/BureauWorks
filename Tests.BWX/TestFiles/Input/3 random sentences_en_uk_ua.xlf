@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns:bwx="https://bwx.io/ns/xlf" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file bwx:wu-id="cff9f66a-4056-40bb-acfd-46c9d82bcf2f" original="3 random sentences.txt" source-language="en" target-language="uk-UA" datatype="x-undefined">
+<body>
+<trans-unit id="e1059d7e-f6d2-47bd-841c-dacb74c4521a-0-1" bwx:ts-id="e1059d7e-f6d2-47bd-841c-dacb74c4521a" xml:space="preserve">
+<source xml:lang="en">They ran around the corner to find that they had traveled back in time.</source>
+<target xml:lang="uk-UA">Вони забігли за ріг і виявили, що повернулися в минуле.</target>
+<alt-trans origin="bwx-tm"><target xml:lang="uk-UA">Вони забігли за ріг і виявили, що повернулися в минуле.</target>
+</alt-trans>
+</trans-unit>
+<trans-unit id="d632c836-0b97-44d4-b6fd-3afba29e8b5b-1-2" bwx:ts-id="d632c836-0b97-44d4-b6fd-3afba29e8b5b" xml:space="preserve">
+<source xml:lang="en">Seek success, but always be prepared for random cats.</source>
+<target xml:lang="uk-UA">Прагніть успіху, але завжди будьте готові до випадкових котів.</target>
+<alt-trans origin="bwx-tm"><target xml:lang="uk-UA">Прагніть успіху, але завжди будьте готові до випадкових котів.</target>
+</alt-trans>
+</trans-unit>
+<trans-unit id="84ac12ec-1fcc-4ba5-9954-9df457e0184f-2-3" bwx:ts-id="84ac12ec-1fcc-4ba5-9954-9df457e0184f" xml:space="preserve">
+<source xml:lang="en">It isn't true that my mattress is made of cotton candy.</source>
+<target xml:lang="uk-UA">Це неправда, що мій матрац зроблений із цукрової вати.</target>
+<alt-trans origin="bwx-tm"><target xml:lang="uk-UA">Це неправда, що мій матрац зроблений із цукрової вати.</target>
+</alt-trans>
+</trans-unit>
+<trans-unit id="36159d68-3f2f-42f1-8468-bb4f6857a55f-3-4" bwx:ts-id="36159d68-3f2f-42f1-8468-bb4f6857a55f" xml:space="preserve">
+<source xml:lang="en">Tomatoes make great weapons when water balloons aren’t available.</source>
+<target xml:lang="uk-UA">Помідори стають чудовою зброєю, коли немає водяних кульок.</target>
+<alt-trans origin="bwx-tm"><target xml:lang="uk-UA">Помідори стають чудовою зброєю, коли немає водяних кульок.</target>
+</alt-trans>
+</trans-unit>
+<trans-unit id="609b0d3f-bbc9-4ccd-b1a1-5dc180b1613d-4-5" bwx:ts-id="609b0d3f-bbc9-4ccd-b1a1-5dc180b1613d" xml:space="preserve">
+<source xml:lang="en">It caught him off guard that space smelled of seared steak.</source>
+<target xml:lang="uk-UA">Його здивувало, що космос пахне смаженим стейком.</target>
+<alt-trans origin="bwx-tm"><target xml:lang="uk-UA">Його здивувало, що космос пахне смаженим стейком.</target>
+</alt-trans>
+</trans-unit>
+</body>
+</file>
+</xliff>

@@ -20,7 +20,10 @@ public class WorkUnitDataHandler(
         var request = new RestRequest($"/api/v3/project/{project.ProjectId}/work-unit", Method.Get);
         var response = await Client.ExecuteWithErrorHandling<ContentWrapper<WorkUnitDataHandlerDto>>(request);
         return response.Content.Select(x => 
-            new DataSourceItem(x.Uuid, CultureInfo.CurrentCulture.TextInfo.ToTitleCase(x.WorkflowName.ToLower()))
+            new DataSourceItem(
+                x.Uuid, 
+                CultureInfo.CurrentCulture.TextInfo.ToTitleCase(x.WorkflowName.ToLower()).Replace('_', ' ')
+            )
         );
     }
 }

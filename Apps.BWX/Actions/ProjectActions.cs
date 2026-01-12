@@ -258,7 +258,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
             confirmOnlyChangeSegments = input.ConfirmOnlyChangedSegments,
             confirmAllNotEmpty = input.ConfirmAllImportedSegments
         });
-        await Client.ExecuteWithErrorHandling(uploadResourceRequest);
+        await Client.ExecuteWithErrorHandling(importRequest);
     }
 
     private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
@@ -298,7 +298,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         throw new PluginApplicationException("Timeout waiting for translation files to be prepared");
     }
 
-    private async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
+    private static async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
     {
         var client = new RestClient();
         var downloadRequest = new RestRequest(downloadUrl, Method.Get);
@@ -338,7 +338,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return translatedFiles;
     }
 
-    private void AddResourcesAndLocalesParameters(RestRequest request, DownloadTranslatedFilesRequest downloadRequest)
+    private static void AddResourcesAndLocalesParameters(RestRequest request, DownloadTranslatedFilesRequest downloadRequest)
     {
         if (downloadRequest.Resources != null && downloadRequest.Resources.Any())
         {

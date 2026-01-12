@@ -84,10 +84,10 @@ public class ProjectActionsTests : TestBase
         var project = new GetProjectRequest { ProjectId = "ff84a3ed-1b52-4f2d-9269-9185e2f6aec7" };
         var input = new UploadProjectResourceRequest
         {
-            ConfirmAllImportedSegments = false,
-            ConfirmOnlyChangedSegments = true,
-            WorkUnitUuid = "aa59e845-8eb6-4a4c-a171-3caad18f7779",
-            File = new FileReference { Name = "3 random sentences_.txt" }
+            ConfirmAllImportedSegments = true,
+            ConfirmOnlyChangedSegments = false,
+            WorkUnitUuid = "cff9f66a-4056-40bb-acfd-46c9d82bcf2f",
+            File = new FileReference { Name = "3 random sentences_en_uk_ua.xlf" }
         };
 
         // Act
