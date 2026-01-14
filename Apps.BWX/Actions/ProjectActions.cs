@@ -8,7 +8,6 @@ using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
-using DocumentFormat.OpenXml.Office2016.Excel;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -157,8 +156,8 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
 
     [Action("Export project as Loc kit", Description = "Exports project files as a zip files containing XLIFF or XLSX")]
     public async Task<FileResponse> ExportProjectLocKit(
-    [ActionParameter] GetProjectRequest projectRequest,
-    [ActionParameter] ExportLocKitRequest exportRequest)
+        [ActionParameter] GetProjectRequest projectRequest,
+        [ActionParameter] ExportLocKitRequest exportRequest)
     {
         var startRequest = new RestRequest(
             $"/api/v3/project/{projectRequest.ProjectId}/translation-kit-job/loc-kit",
@@ -210,7 +209,51 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
             File = uploadedFile
         };
     }
-      
+
+    [Action("Upload and import file to project resource", Description = "Uploads and imports a file to update project resources")]
+    public async Task UploadProjectResource(
+        [ActionParameter] GetProjectRequest projectRequest,
+        [ActionParameter] UploadProjectResourceRequest input)
+    {
+        input.Validate();
+
+        string projectId = projectRequest.ProjectId;
+        string workUnitId = input.WorkUnitUuid;
+
+        // Create project resource
+        var createResourceRequest = new RestRequest($"/api/v3/project/{projectId}/resource", Method.Post);
+        createResourceRequest.AddJsonBody(new
+        {
+            name = input?.FileName ?? input!.File.Name,
+            path = input?.FilePath ?? input!.File.Name,
+            notes = input.Notes
+        });
+        var createResourceResponse = await Client.ExecuteWithErrorHandling<ProjectResourceDto>(createResourceRequest);
+        string resourceId = createResourceResponse.Uuid;
+
+        // Upload files to it
+        var uploadResourceRequest = new RestRequest(
+            $"/api/v3/project/{projectId}/resource/{resourceId}/content", 
+            Method.Put
+        ); 
+        var fileBytes = await (await fileManagementClient.DownloadAsync(input.File)).GetByteData();
+        uploadResourceRequest.AlwaysMultipartFormData = true;
+        uploadResourceRequest.AddFile("file", fileBytes, input.File.Name);
+        await Client.ExecuteWithErrorHandling(uploadResourceRequest);
+
+        // Import
+        var importRequest = new RestRequest(
+            $"/api/v3/project/{projectId}/translation-kit-job/work-unit/{workUnitId}/resource/{resourceId}/import",
+            Method.Post
+        );
+        importRequest.AddJsonBody(new
+        {
+            importType = input.ImportFileType,
+            confirmOnlyChangeSegments = input.ConfirmOnlyChangedSegments,
+            confirmAllNotEmpty = input.ConfirmAllImportedSegments
+        });
+        await Client.ExecuteWithErrorHandling(importRequest);
+    }
 
     private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
     {
@@ -249,7 +292,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         throw new PluginApplicationException("Timeout waiting for translation files to be prepared");
     }
 
-    private async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
+    private static async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
     {
         var client = new RestClient();
         var downloadRequest = new RestRequest(downloadUrl, Method.Get);
@@ -289,7 +332,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return translatedFiles;
     }
 
-    private void AddResourcesAndLocalesParameters(RestRequest request, DownloadTranslatedFilesRequest downloadRequest)
+    private static void AddResourcesAndLocalesParameters(RestRequest request, DownloadTranslatedFilesRequest downloadRequest)
     {
         if (downloadRequest.Resources != null && downloadRequest.Resources.Any())
         {
