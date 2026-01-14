@@ -87,6 +87,7 @@ public class ProjectActionsTests : TestBase
             ConfirmAllImportedSegments = true,
             ConfirmOnlyChangedSegments = false,
             WorkUnitUuid = "cff9f66a-4056-40bb-acfd-46c9d82bcf2f",
+            ImportFileType = "XLIFF",
             File = new FileReference { Name = "3 random sentences_en_uk_ua.xlf" }
         };
 

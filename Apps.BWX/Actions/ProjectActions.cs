@@ -210,18 +210,12 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         };
     }
 
-    [Action("Upload and import file to project resource", Description = "Uploads and imports a translation file to update project resources")]
+    [Action("Upload and import file to project resource", Description = "Uploads and imports a file to update project resources")]
     public async Task UploadProjectResource(
         [ActionParameter] GetProjectRequest projectRequest,
         [ActionParameter] UploadProjectResourceRequest input)
     {
-        if (input.ConfirmAllImportedSegments == true && input.ConfirmOnlyChangedSegments == true)
-        {
-            throw new PluginMisconfigurationException(
-                "It's only possible to either confirm only changed segments or confirm all imported segments. " +
-                "These two values can't be true at the same time"
-            );
-        }
+        input.Validate();
 
         string projectId = projectRequest.ProjectId;
         string workUnitId = input.WorkUnitUuid;
@@ -254,7 +248,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         );
         importRequest.AddJsonBody(new
         {
-            importType = "XLIFF",
+            importType = input.ImportFileType,
             confirmOnlyChangeSegments = input.ConfirmOnlyChangedSegments,
             confirmAllNotEmpty = input.ConfirmAllImportedSegments
         });
