@@ -210,7 +210,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         };
     }
 
-    [Action("Upload and import file to project resource", Description = "")]
+    [Action("Upload and import file to project resource", Description = "Uploads and imports a translation file to update project resources")]
     public async Task UploadProjectResource(
         [ActionParameter] GetProjectRequest projectRequest,
         [ActionParameter] UploadProjectResourceRequest input)
