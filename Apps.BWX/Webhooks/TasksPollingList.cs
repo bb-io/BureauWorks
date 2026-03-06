@@ -2,6 +2,7 @@
 using Apps.BWX.Models.Task.Requests;
 using Apps.BWX.Models.Task.Response;
 using Apps.BWX.Webhooks.Models;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
 using RestSharp;
@@ -52,7 +53,7 @@ public class TasksPollingList(InvocationContext invocationContext) : BWXInvocabl
         var tasks = await Client.PaginateOnce<TaskDto>(request);
         
         var task = tasks.FirstOrDefault(t => t.Uuid == taskWithStatusRequest.TaskId)
-            ?? throw new Exception($"Task with ID {taskWithStatusRequest.TaskId} not found.");
+            ?? throw new PluginMisconfigurationException($"Task with ID {taskWithStatusRequest.TaskId} was not found.");
         
         return task;
     }

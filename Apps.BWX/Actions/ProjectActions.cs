@@ -4,7 +4,6 @@ using Apps.BWX.Models.Project.Requests;
 using Apps.BWX.Models.Project.Responses;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
-using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Utils.Extensions.Files;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
@@ -123,21 +122,6 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         return await Client.ExecuteWithErrorHandling<ProjectDto>(request);
     }
 
-    //Temporarily commenting out the async method because it throws BadRequest System error. Sync method works fine (see below)
-
-    //[Action("Download translated files", Description = "Download translated files for project")]
-    //public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
-    //    [ActionParameter] GetProjectRequest getProjectRequest,
-    //    [ActionParameter] DownloadTranslatedFilesRequest downloadTranslatedFilesRequest)
-    //{
-    //    string requestUuid = await InitiateTranslationDownload(getProjectRequest.ProjectId, downloadTranslatedFilesRequest);
-    //    string downloadUrl = await WaitForTranslationPreparation(getProjectRequest.ProjectId, requestUuid);
-    //    byte[] fileContent = await DownloadTranslationArchive(downloadUrl);
-
-    //    var project = await GetProject(getProjectRequest);
-    //    return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
-    //}
-
     [Action("Download translated files", Description = "Download translated files for project")]
     public async Task<DownloadTranslatedFilesResponse> DownloadTranslatedFiles(
        [ActionParameter] GetProjectRequest getProjectRequest,
@@ -150,8 +134,7 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         byte[] fileContent = Response.RawBytes;
 
         var project = await GetProject(getProjectRequest);
-        return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);
-        
+        return await ProcessTranslationFiles(fileContent, project.SourceLocale, project.TargetLocales);        
     }
 
     [Action("Export project as Loc kit", Description = "Exports project files as a zip files containing XLIFF or XLSX")]
@@ -255,53 +238,10 @@ public class ProjectActions(InvocationContext invocationContext, IFileManagement
         await Client.ExecuteWithErrorHandling(importRequest);
     }
 
-    private async Task<string> InitiateTranslationDownload(string projectId, DownloadTranslatedFilesRequest downloadRequest)
+    private async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
     {
-        var initiateRequest = new RestRequest($"/api/v3/project/{projectId}/download", Method.Post);
-        AddResourcesAndLocalesParameters(initiateRequest, downloadRequest);
-        var initiateResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationInitiateResponse>(initiateRequest);
-        return initiateResponse.RequestUuid;
-    }
-
-    private async Task<string> WaitForTranslationPreparation(string projectId, string requestUuid)
-    {
-        var statusRequest = new RestRequest(
-            $"/api/v3/project/{projectId}/download/{requestUuid}/status", Method.Get);
-
-        const int maxAttempts = 30;
-        const int pollingIntervalMs = 20000;
-        int attempts = 0;
-
-        while (attempts < maxAttempts)
-        {
-            if (attempts > 0)
-            {
-                await Task.Delay(pollingIntervalMs);
-            }
-
-            var statusResponse = await Client.ExecuteWithErrorHandling<DownloadTranslationStatusResponse>(statusRequest);
-
-            if (statusResponse.Status == "COMPLETED")
-            {
-                return statusResponse.DownloadUrl;
-            }
-
-            attempts++;
-        }
-
-        throw new PluginApplicationException("Timeout waiting for translation files to be prepared");
-    }
-
-    private static async Task<byte[]> DownloadTranslationArchive(string downloadUrl)
-    {
-        var client = new RestClient();
         var downloadRequest = new RestRequest(downloadUrl, Method.Get);
-        var downloadResponse = await client.ExecuteAsync(downloadRequest);
-
-        if (!downloadResponse.IsSuccessful)
-        {
-            throw new Exception($"Failed to download translation files: {downloadResponse.ErrorMessage}");
-        }
+        var downloadResponse = await Client.ExecuteWithErrorHandling(downloadRequest);
 
         return downloadResponse.RawBytes!;
     }
